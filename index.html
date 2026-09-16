@@ -10,6 +10,7 @@
     <meta name="theme-color" content="#3b82f6">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3898/3898082.png">
 
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -19,7 +20,13 @@
             }
         }
     </script>
+    
+    <!-- FontAwesome & Libraries Ekstrak File -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
     <style>
         .grammar-active .tag-subject { color: #2563eb; font-weight: 700; cursor: help; border-bottom: 2px dotted #2563eb; transition: all 0.2s; }
         .grammar-active .tag-verb { color: #dc2626; font-weight: 700; cursor: help; border-bottom: 2px dotted #dc2626; transition: all 0.2s; }
@@ -30,6 +37,10 @@
         .translate-active rt.arti-indo { display: ruby-text; font-size: 0.75rem; color: #059669; font-family: sans-serif; font-weight: 700; }
         .dark .translate-active rt.arti-indo { color: #34d399; }
         .translate-active #document-content { line-height: 2.5; }
+
+        /* Saklar Cara Baca (Fonetik) */
+        .phonetic-input-wrapper { display: none; }
+        .phonetic-active .phonetic-input-wrapper { display: block; }
 
         @media print {
             body { background-color: white !important; }
@@ -48,7 +59,6 @@
         <h1 class="text-2xl font-black text-primary tracking-tighter"><i class="fa-solid fa-microphone-lines mr-2"></i>SPIK <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Studio</span></h1>
         
         <div class="flex items-center gap-3">
-            <!-- Tombol Install PWA (Awalnya disembunyikan, muncul jika browser mendukung) -->
             <button id="install-btn" class="hidden bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow transition font-medium flex items-center text-sm">
                 <i class="fa-solid fa-download mr-1"></i> Install App
             </button>
@@ -61,16 +71,25 @@
     <main class="flex-grow w-full max-w-6xl mx-auto p-4 flex flex-col gap-6 mt-4">
         
         <div id="control-panel" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <div class="flex justify-between items-center mb-2">
+            <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
                 <label class="block text-sm font-semibold dark:text-gray-300">
-                    <i class="fa-solid fa-file-lines mr-2"></i>Teks Naskah / Hasil Dengar:
+                    <i class="fa-solid fa-file-lines mr-2"></i>Teks Naskah / Upload File:
                 </label>
-                <span id="mic-status" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500">
-                    Mic Siap
-                </span>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Tombol Upload File -->
+                    <input type="file" id="file-upload" class="hidden" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handleFileUpload(event)">
+                    <button onclick="document.getElementById('file-upload').click()" class="text-xs font-semibold px-3 py-1.5 rounded bg-indigo-100 hover:bg-indigo-200 text-indigo-700 transition flex items-center cursor-pointer shadow-sm">
+                        <i class="fa-solid fa-file-arrow-up mr-1"></i> Upload (PDF/Word/Gbr)
+                    </button>
+
+                    <span id="mic-status" class="text-xs font-semibold px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 shadow-sm">
+                        Mic Siap
+                    </span>
+                </div>
             </div>
 
-            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Ketik/paste naskah (Inggris atau Indonesia), lalu gunakan pengatur di bawah..."></textarea>
+            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Ketik/paste naskah, bicara via mic, atau upload file PDF/Word/Gambar di atas..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
                 <button id="btn-mic-en" onclick="toggleListening('en-US')" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm">
@@ -90,11 +109,17 @@
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Buat Naskah
                 </button>
                 
+                <!-- Kelompok Saklar Fitur -->
                 <button id="btn-grammar" onclick="toggleGrammar()" class="bg-purple-600 text-white px-3 py-2 rounded shadow hover:bg-purple-700 transition font-medium flex items-center text-sm">
                     <i id="grammar-icon" class="fa-solid fa-eye mr-2"></i> <span id="grammar-text">Warna Pola (ON)</span>
                 </button>
-                <button id="btn-translate" onclick="toggleTranslate()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-sm">
+                <button id="btn-translate" onclick="toggleTranslate()" class="bg-teal-600 text-white px-3 py-2 rounded shadow hover:bg-teal-700 transition font-medium flex items-center text-sm">
                     <i id="translate-icon" class="fa-solid fa-language mr-2"></i> <span id="translate-text">Makna Gandul (ON)</span>
+                </button>
+                
+                <!-- Saklar Baru: Cara Baca Fonetik -->
+                <button id="btn-phonetic" onclick="togglePhonetic()" class="bg-sky-600 text-white px-3 py-2 rounded shadow hover:bg-sky-700 transition font-medium flex items-center text-sm">
+                    <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-2"></i> <span id="phonetic-text">Cara Baca (ON)</span>
                 </button>
 
                 <button onclick="window.print()" class="bg-green-600 text-white px-3 py-2 rounded shadow hover:bg-green-700 transition font-medium flex items-center text-sm ml-auto">
@@ -103,12 +128,13 @@
             </div>
             
             <div id="loading-indicator" class="hidden mt-3 text-sm text-blue-600 font-semibold animate-pulse">
-                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang menerjemahkan teks ke bahasa Inggris...
+                <i id="loading-icon" class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="loading-text">Sedang memproses...</span>
             </div>
         </div>
 
         <div class="overflow-x-auto pb-8">
-            <div id="paper-workspace" class="grammar-active translate-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
+            <!-- Tambahkan class phonetic-active sebagai default -->
+            <div id="paper-workspace" class="grammar-active translate-active phonetic-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
                 
                 <div class="text-center mb-8 border-b-2 border-gray-800 pb-4 print-hidden">
                     <h2 class="text-3xl font-serif font-bold text-gray-300">AREA KERTAS NASKAH</h2>
@@ -129,6 +155,10 @@
     </footer>
 
     <script>
+        // Konfigurasi Pustaka PDF
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        // --- KAMUS BISPIK SUPER ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
@@ -159,7 +189,63 @@
             "perfect": { p: "perfekt", c: "", i: "sempurna" }
         };
 
-        // --- SAKLAR ---
+        // --- UPLOAD & EKSTRAK FILE (PDF, DOCX, IMG) ---
+        async function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const loadingText = document.getElementById('loading-text');
+            const textArea = document.getElementById('inputText');
+            
+            loadingText.innerText = `Sedang mengekstrak teks dari file ${file.name}...`;
+            loadingIndicator.classList.remove('hidden');
+
+            try {
+                let extractedText = '';
+                const fileType = file.name.split('.').pop().toLowerCase();
+
+                if (fileType === 'pdf') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    let fullText = '';
+                    for (let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        fullText += textContent.items.map(item => item.str).join(' ') + '\n';
+                    }
+                    extractedText = fullText;
+                } 
+                else if (fileType === 'doc' || fileType === 'docx') {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+                    extractedText = result.value;
+                } 
+                else if (['png', 'jpg', 'jpeg'].includes(fileType)) {
+                    // OCR Kecerdasan Buatan untuk Gambar (Mendukung Inggris & Indo)
+                    const result = await Tesseract.recognize(file, 'eng+ind');
+                    extractedText = result.data.text;
+                } 
+                else {
+                    alert('Format file tidak didukung.');
+                }
+
+                if (extractedText.trim() !== '') {
+                    if (textArea.value.trim() !== '') textArea.value += '\n\n';
+                    textArea.value += extractedText.trim();
+                } else {
+                    alert('Gagal menemukan teks yang bisa dibaca di dalam file ini.');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Terjadi kesalahan saat membaca file. Pastikan file tidak rusak.');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                event.target.value = ''; // Reset input file
+            }
+        }
+
+        // --- KELOMPOK SAKLAR ---
         let isGrammarActive = true;
         function toggleGrammar() {
             isGrammarActive = !isGrammarActive;
@@ -195,6 +281,25 @@
                 document.getElementById('translate-text').innerText = "Makna Gandul (OFF)";
                 btn.classList.replace('bg-teal-600', 'bg-gray-500');
                 btn.classList.replace('hover:bg-teal-700', 'hover:bg-gray-600');
+            }
+        }
+
+        // Saklar Baru: Cara Baca Fonetik
+        let isPhoneticActive = true;
+        function togglePhonetic() {
+            isPhoneticActive = !isPhoneticActive;
+            const workspace = document.getElementById('paper-workspace');
+            const btn = document.getElementById('btn-phonetic');
+            if (isPhoneticActive) {
+                workspace.classList.add('phonetic-active');
+                document.getElementById('phonetic-text').innerText = "Cara Baca (ON)";
+                btn.classList.replace('bg-gray-500', 'bg-sky-600');
+                btn.classList.replace('hover:bg-gray-600', 'hover:bg-sky-700');
+            } else {
+                workspace.classList.remove('phonetic-active');
+                document.getElementById('phonetic-text').innerText = "Cara Baca (OFF)";
+                btn.classList.replace('bg-sky-600', 'bg-gray-500');
+                btn.classList.replace('hover:bg-sky-700', 'hover:bg-gray-600');
             }
         }
 
@@ -242,6 +347,7 @@
                 const textArea = document.getElementById('inputText');
                 if (currentMicMode === 'id-ID') {
                     document.getElementById('loading-indicator').classList.remove('hidden');
+                    document.getElementById('loading-text').innerText = "Menerjemahkan suara ke bahasa Inggris...";
                     const translatedSpeech = await translateIdToEn(currentSpeech);
                     currentSpeech = translatedSpeech === currentSpeech ? "(Gagal terjemah: " + currentSpeech + ")" : translatedSpeech;
                     document.getElementById('loading-indicator').classList.add('hidden');
@@ -276,14 +382,14 @@
                 document.getElementById('mic-icon-id').className = "fa-solid fa-circle-stop mr-2";
                 status.innerText = "Mic AKTIF (Bicara Indo)";
             }
-            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 text-red-700";
+            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 shadow-sm";
         }
 
         function stopListening() {
             isListening = false; currentMicMode = ''; if (recognition) recognition.stop();
             resetMicButtons();
             const status = document.getElementById('mic-status');
-            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500";
+            status.className = "text-xs font-semibold px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 shadow-sm";
             status.innerText = "Mic Siap";
         }
 
@@ -302,6 +408,7 @@
             const docContent = document.getElementById('document-content');
             const colorLegend = document.getElementById('color-legend');
             const loadingIndicator = document.getElementById('loading-indicator');
+            const loadingText = document.getElementById('loading-text');
             
             docContent.innerHTML = '';
 
@@ -311,6 +418,7 @@
             }
 
             if (isInputIdToEnActive && !skipTranslation) {
+                loadingText.innerText = "Sedang menerjemahkan teks ke bahasa Inggris...";
                 loadingIndicator.classList.remove('hidden');
                 const translated = await translateIdToEn(rawText);
                 if (translated) rawText = translated;
@@ -367,7 +475,11 @@
                 block.innerHTML = `
                     <div class="pr-12">
                         <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
-                        <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
+                        
+                        <!-- Wrapper Fonetik yang dikontrol oleh tombol saklar -->
+                        <div class="phonetic-input-wrapper">
+                            <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
+                        </div>
                     </div>
                     <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200 mt-2">
                         <i class="fa-solid fa-volume-high"></i>
@@ -406,7 +518,7 @@
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('PWA Service Worker terdaftar'))
-                    .catch(err => console.log('Info PWA: Tambahkan file sw.js dan manifest.json di github agar bisa diinstal.'));
+                    .catch(err => console.log('PWA Note: Tambahkan sw.js & manifest.json di repository.'));
             });
         }
 
