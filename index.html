@@ -19,25 +19,30 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* CSS Khusus Mode Tata Bahasa (Dikontrol oleh class 'grammar-active' di JS) */
-        .grammar-active .tag-subject { 
-            color: #2563eb; 
-            font-weight: 700; 
-            cursor: help; 
-            border-bottom: 2px dotted #2563eb;
-            transition: all 0.2s;
-        }
-        .grammar-active .tag-verb { 
-            color: #dc2626; 
-            font-weight: 700; 
-            cursor: help; 
-            border-bottom: 2px dotted #dc2626;
-            transition: all 0.2s;
-        }
-        
-        /* Warna Dark Mode untuk Tata Bahasa */
+        /* CSS Khusus Mode Tata Bahasa */
+        .grammar-active .tag-subject { color: #2563eb; font-weight: 700; cursor: help; border-bottom: 2px dotted #2563eb; transition: all 0.2s; }
+        .grammar-active .tag-verb { color: #dc2626; font-weight: 700; cursor: help; border-bottom: 2px dotted #dc2626; transition: all 0.2s; }
         .dark .grammar-active .tag-subject { color: #60a5fa; border-bottom-color: #60a5fa; }
         .dark .grammar-active .tag-verb { color: #f87171; border-bottom-color: #f87171; }
+
+        /* CSS Khusus Terjemahan (Makna Gandul Style) */
+        rt.arti-indo {
+            display: none; /* Sembunyi secara default */
+        }
+        .translate-active rt.arti-indo {
+            display: ruby-text;
+            font-size: 0.75rem;
+            color: #059669; /* Emerald 600 */
+            font-family: sans-serif;
+            font-weight: 700;
+        }
+        .dark .translate-active rt.arti-indo {
+            color: #34d399; /* Emerald 400 */
+        }
+        /* Menambahkan jarak antar baris saat terjemahan aktif agar tidak bertumpuk */
+        .translate-active #document-content {
+            line-height: 2.5; 
+        }
 
         @media print {
             body { background-color: white !important; }
@@ -47,9 +52,9 @@
                 max-width: 100% !important; background-color: transparent !important;
             }
             .phonetic-input { border: none !important; color: #4b5563 !important; }
-            /* Warna tetap muncul di kertas jika saklar tata bahasa sedang ON saat diprint */
             .grammar-active .tag-subject { color: #2563eb !important; border-bottom: none !important;}
             .grammar-active .tag-verb { color: #dc2626 !important; border-bottom: none !important;}
+            .translate-active rt.arti-indo { color: #059669 !important; }
         }
     </style>
 </head>
@@ -80,20 +85,24 @@
             <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Ketik/paste naskah, atau aktifkan 'Dengar Percakapan' untuk mendengarkan lawan bicara..."></textarea>
             
             <div class="flex flex-wrap gap-3 mt-4">
-                <button id="btn-mic" onclick="toggleListening()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg shadow transition font-medium flex items-center">
+                <button id="btn-mic" onclick="toggleListening()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg shadow transition font-medium flex items-center text-sm">
                     <i id="mic-icon" class="fa-solid fa-microphone mr-2"></i> <span id="mic-text">Dengar Teman (Mic ON)</span>
                 </button>
 
-                <button onclick="processText()" class="bg-primary text-white px-5 py-2.5 rounded-lg shadow hover:bg-blue-600 transition font-medium flex items-center">
+                <button onclick="processText()" class="bg-primary text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition font-medium flex items-center text-sm">
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Buat Naskah
                 </button>
                 
-                <!-- Tombol Baru: Saklar Tata Bahasa -->
-                <button id="btn-grammar" onclick="toggleGrammar()" class="bg-purple-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-purple-700 transition font-medium flex items-center">
+                <button id="btn-grammar" onclick="toggleGrammar()" class="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition font-medium flex items-center text-sm">
                     <i id="grammar-icon" class="fa-solid fa-eye mr-2"></i> <span id="grammar-text">Warna Pola (ON)</span>
                 </button>
 
-                <button onclick="window.print()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition font-medium flex items-center">
+                <!-- Tombol Baru: Saklar Terjemahan -->
+                <button id="btn-translate" onclick="toggleTranslate()" class="bg-gray-500 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-600 transition font-medium flex items-center text-sm">
+                    <i id="translate-icon" class="fa-solid fa-language mr-2"></i> <span id="translate-text">Terjemah (OFF)</span>
+                </button>
+
+                <button onclick="window.print()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition font-medium flex items-center text-sm">
                     <i class="fa-solid fa-file-pdf mr-2"></i> Cetak PDF
                 </button>
             </div>
@@ -101,7 +110,7 @@
 
         <!-- Area Kerja Kertas -->
         <div class="overflow-x-auto pb-8">
-            <!-- Container Kertas: Default memiliki class 'grammar-active' -->
+            <!-- Container Kertas -->
             <div id="paper-workspace" class="grammar-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
                 
                 <div class="text-center mb-8 border-b-2 border-gray-800 pb-4 print-hidden">
@@ -109,14 +118,18 @@
                     <p class="text-sm text-gray-400 mt-2">Naskah atau suara yang didengar akan muncul di sini.</p>
                 </div>
 
-                <div id="color-legend" class="hidden mb-6 bg-blue-50 p-3 rounded text-sm print-hidden border border-blue-100">
-                    <strong>Petunjuk:</strong> 
-                    Arahkan atau sentuh teks bergaris putus-putus untuk mengetahui fungsinya.<br>
-                    <span class="text-blue-600 font-bold">Biru = Subjek (Pelaku)</span> | 
-                    <span class="text-red-600 font-bold">Merah = Kata Kerja (Aktivitas)</span>
+                <div id="color-legend" class="hidden mb-6 bg-blue-50 p-3 rounded text-sm print-hidden border border-blue-100 flex flex-wrap gap-4 justify-between items-center">
+                    <div>
+                        <strong>Petunjuk Warna:</strong> 
+                        <span class="text-blue-600 font-bold ml-2">Biru = Subjek</span> | 
+                        <span class="text-red-600 font-bold">Merah = Kata Kerja</span>
+                    </div>
+                    <div class="text-emerald-600 font-bold">
+                        <i class="fa-solid fa-language"></i> Teks Hijau = Arti Kata
+                    </div>
                 </div>
 
-                <div id="document-content" class="space-y-8 font-serif text-lg leading-relaxed">
+                <div id="document-content" class="space-y-8 font-serif text-xl leading-relaxed">
                     <!-- Teks naskah di-render ke sini -->
                 </div>
 
@@ -125,45 +138,42 @@
 
     </main>
 
-    <footer class="text-center p-4 text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden">
-        &copy; 2026 Spik. Baca Inggris Tanpa Meringis.
-    </footer>
-
     <script>
-        // --- KAMUS BISPIK DIPERLUAS ---
+        // --- KAMUS BISPIK (Ditambah 'i' untuk arti Indonesia) ---
         const spikDictionary = {
-            // Pronouns (Kata Ganti / Subjek)
-            "i": { p: "ai", c: "subject" }, "you": { p: "yu", c: "subject" }, 
-            "they": { p: "dei", c: "subject" }, "we": { p: "wi", c: "subject" }, 
-            "he": { p: "hi", c: "subject" }, "she": { p: "syi", c: "subject" }, 
-            "it": { p: "it", c: "subject" }, "everyone": { p: "evriwan", c: "subject" },
+            // Pronouns (Kata Ganti)
+            "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
+            "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
+            "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
+            "it": { p: "it", c: "subject", i: "itu" },
             
-            // To Be & Kata Kerja Bantu
-            "am": { p: "em", c: "verb" }, "is": { p: "is", c: "verb" }, "are": { p: "ar", c: "verb" },
-            "was": { p: "wos", c: "verb" }, "were": { p: "wer", c: "verb" },
-            "do": { p: "du", c: "verb" }, "does": { p: "das", c: "verb" }, "did": { p: "did", c: "verb" },
-            "have": { p: "hev", c: "verb" }, "has": { p: "hes", c: "verb" }, "had": { p: "hed", c: "verb" },
-            "will": { p: "wil", c: "verb" }, "can": { p: "ken", c: "verb" },
+            // To Be & Bantuan
+            "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
+            "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
+            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "memiliki" },
             
-            // Kata Kerja Aktivitas Umum
-            "go": { p: "go", c: "verb" }, "want": { p: "won", c: "verb" }, 
-            "learn": { p: "lern", c: "verb" }, "speak": { p: "spik", c: "verb" },
-            "walk": { p: "wok", c: "verb" }, "seek": { p: "sik", c: "verb" },
-            "guide": { p: "gaid", c: "verb" }, "causes": { p: "koses", c: "verb" }, 
-            "mislead": { p: "mislid", c: "verb" }, "look": { p: "luk", c: "verb" },
-            
-            // Kata benda / lainnya dari riwayat teks
-            "all": { p: "ol", c: "" }, "praise": { p: "preis", c: "" }, "due": { p: "du", c: "" }, 
-            "to": { p: "tu", c: "" }, "allah": { p: "allah", c: "subject" }, "him": { p: "him", c: "" }, 
-            "for": { p: "for", c: "" }, "his": { p: "his", c: "" }, "assistance": { p: "asistens", c: "" }, 
-            "and": { p: "en", c: "" }, "forgiveness": { p: "forgivnes", c: "" }, "refuge": { p: "refyuj", c: "" }, 
-            "with": { p: "wid", c: "" }, "from": { p: "from", c: "" }, "evils": { p: "ivels", c: "" },
-            "of": { p: "ov", c: "" }, "our": { p: "aur", c: "" }, "souls": { p: "souls", c: "" }, 
-            "misdeeds": { p: "misdids", c: "" }, "no": { p: "no", c: "" }, "one": { p: "wan", c: "subject" }, 
-            "whosoever": { p: "husoeber", c: "subject" }, "none": { p: "nan", c: "subject" }, 
-            "astray": { p: "astrei", c: "" }, "how": { p: "hau", c: "" }, "english": { p: "ingglis", c: "" }, 
-            "naturally": { p: "necereli", c: "" }, "the": { p: "de", c: "" }, "weather": { p: "weder", c: "subject" },
-            "rough": { p: "raf", c: "" }, "through": { p: "thru", c: "" }
+            // Kosa kata dari gambar Naskah Khotbah Anda
+            "the": { p: "de", c: "", i: "" }, // Artikel the biasanya tidak diterjemahkan agar luwes
+            "purity": { p: "pyuriti", c: "", i: "kesucian" },
+            "all": { p: "ol", c: "", i: "segala" },
+            "praise": { p: "preis", c: "", i: "pujian" },
+            "for": { p: "for", c: "", i: "untuk" },
+            "allah": { p: "allah", c: "subject", i: "Allah" },
+            "him": { p: "him", c: "", i: "Dia" },
+            "seek": { p: "sik", c: "verb", i: "mencari" },
+            "his": { p: "his", c: "", i: "-Nya" },
+            "aid": { p: "eid", c: "", i: "bantuan" },
+            "and": { p: "en", c: "", i: "dan" },
+            "ask": { p: "ask", c: "verb", i: "meminta" },
+            "forgiveness": { p: "forgivnes", c: "", i: "ampunan" },
+            "testify": { p: "testifai", c: "verb", i: "bersaksi" },
+            "that": { p: "det", c: "", i: "bahwa" },
+            "none": { p: "nan", c: "subject", i: "tiada" },
+            "right": { p: "rait", c: "", i: "hak" },
+            "to": { p: "tu", c: "", i: "untuk" },
+            "be": { p: "bi", c: "verb", i: "menjadi" },
+            "worshipped": { p: "worsyipt", c: "verb", i: "disembah" },
+            "except": { p: "eksept", c: "", i: "kecuali" }
         };
 
         // --- SAKLAR TATA BAHASA ---
@@ -174,7 +184,6 @@
             const btn = document.getElementById('btn-grammar');
             const icon = document.getElementById('grammar-icon');
             const text = document.getElementById('grammar-text');
-            const legend = document.getElementById('color-legend');
             
             if (isGrammarActive) {
                 workspace.classList.add('grammar-active');
@@ -182,14 +191,34 @@
                 text.innerText = "Warna Pola (ON)";
                 btn.classList.replace('bg-gray-500', 'bg-purple-600');
                 btn.classList.replace('hover:bg-gray-600', 'hover:bg-purple-700');
-                if(document.getElementById('inputText').value.trim()) legend.classList.remove('hidden');
             } else {
                 workspace.classList.remove('grammar-active');
                 icon.className = "fa-solid fa-eye-slash mr-2";
                 text.innerText = "Warna Pola (OFF)";
                 btn.classList.replace('bg-purple-600', 'bg-gray-500');
                 btn.classList.replace('hover:bg-purple-700', 'hover:bg-gray-600');
-                legend.classList.add('hidden');
+            }
+        }
+
+        // --- SAKLAR TERJEMAHAN (BARU) ---
+        let isTranslateActive = false;
+        function toggleTranslate() {
+            isTranslateActive = !isTranslateActive;
+            const workspace = document.getElementById('paper-workspace');
+            const btn = document.getElementById('btn-translate');
+            const icon = document.getElementById('translate-icon');
+            const text = document.getElementById('translate-text');
+
+            if (isTranslateActive) {
+                workspace.classList.add('translate-active');
+                text.innerText = "Terjemah (ON)";
+                btn.classList.replace('bg-gray-500', 'bg-teal-600');
+                btn.classList.replace('hover:bg-gray-600', 'hover:bg-teal-700');
+            } else {
+                workspace.classList.remove('translate-active');
+                text.innerText = "Terjemah (OFF)";
+                btn.classList.replace('bg-teal-600', 'bg-gray-500');
+                btn.classList.replace('hover:bg-teal-700', 'hover:bg-gray-600');
             }
         }
 
@@ -217,54 +246,32 @@
                 }
                 processText();
             };
-
-            recognition.onerror = (event) => {
-                console.error("Error Suara: ", event.error);
-                stopListening();
-            };
-
-            recognition.onend = () => {
-                if (isListening) recognition.start(); 
-            };
+            recognition.onend = () => { if (isListening) recognition.start(); };
         }
 
         function toggleListening() {
-            if (!recognition) {
-                alert("Browser tidak mendukung pengenalan suara. Gunakan Chrome/Edge.");
-                return;
-            }
-            if (!isListening) startListening();
-            else stopListening();
+            if (!recognition) return alert("Gunakan Chrome/Edge untuk fitur ini.");
+            if (!isListening) startListening(); else stopListening();
         }
 
         function startListening() {
-            isListening = true;
-            recognition.start();
+            isListening = true; recognition.start();
             const btn = document.getElementById('btn-mic');
-            const micText = document.getElementById('mic-text');
-            const micIcon = document.getElementById('mic-icon');
-            const status = document.getElementById('mic-status');
-
-            btn.className = "bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg shadow transition font-medium flex items-center animate-pulse";
-            micText.innerText = "Mendengarkan... (Klik STOP)";
-            micIcon.className = "fa-solid fa-circle-stop mr-2";
-            status.innerText = "Mic AKTIF";
-            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 text-red-700";
+            btn.className = "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg shadow transition font-medium flex items-center text-sm animate-pulse";
+            document.getElementById('mic-text').innerText = "Mendengarkan... (STOP)";
+            document.getElementById('mic-icon').className = "fa-solid fa-circle-stop mr-2";
+            document.getElementById('mic-status').className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 text-red-700";
+            document.getElementById('mic-status').innerText = "Mic AKTIF";
         }
 
         function stopListening() {
-            isListening = false;
-            if (recognition) recognition.stop();
+            isListening = false; if (recognition) recognition.stop();
             const btn = document.getElementById('btn-mic');
-            const micText = document.getElementById('mic-text');
-            const micIcon = document.getElementById('mic-icon');
-            const status = document.getElementById('mic-status');
-
-            btn.className = "bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg shadow transition font-medium flex items-center";
-            micText.innerText = "Dengar Teman (Mic ON)";
-            micIcon.className = "fa-solid fa-microphone mr-2";
-            status.innerText = "Mic Siap";
-            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500";
+            btn.className = "bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg shadow transition font-medium flex items-center text-sm";
+            document.getElementById('mic-text').innerText = "Dengar Teman (Mic ON)";
+            document.getElementById('mic-icon').className = "fa-solid fa-microphone mr-2";
+            document.getElementById('mic-status').className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500";
+            document.getElementById('mic-status').innerText = "Mic Siap";
         }
 
         // --- PEMROSESAN TEKS & KERTAS ---
@@ -281,7 +288,7 @@
                 return;
             }
 
-            if(isGrammarActive) colorLegend.classList.remove('hidden');
+            colorLegend.classList.remove('hidden');
 
             const paragraphs = rawText.split('\n').filter(p => p.trim() !== '');
 
@@ -295,18 +302,25 @@
                 let phoneticWords = [];
 
                 rawWords.forEach(rawWord => {
-                    const cleanWord = rawWord.replace(/[.,?!;:()]/g, "").toLowerCase();
+                    const cleanWord = rawWord.replace(/[.,?!;:()\[\]]/g, "").toLowerCase();
                     const dictionaryEntry = spikDictionary[cleanWord];
 
                     if (dictionaryEntry) {
                         phoneticWords.push(dictionaryEntry.p);
                         let formattedWord = rawWord;
-                        // Penambahan Tag CSS & Atribut Title (Tooltip)
+                        
+                        // Tag Grammar
                         if (dictionaryEntry.c === "subject") {
-                            formattedWord = `<span class="tag-subject" title="Subjek (Pelaku)">${rawWord}</span>`;
+                            formattedWord = `<span class="tag-subject" title="Subjek">${rawWord}</span>`;
                         } else if (dictionaryEntry.c === "verb") {
-                            formattedWord = `<span class="tag-verb" title="Kata Kerja (Aktivitas)">${rawWord}</span>`;
+                            formattedWord = `<span class="tag-verb" title="Kata Kerja">${rawWord}</span>`;
                         }
+
+                        // Menggunakan Tag <ruby> HTML5 untuk Efek Makna Gandul
+                        if (dictionaryEntry.i && dictionaryEntry.i !== "") {
+                            formattedWord = `<ruby>${formattedWord}<rt class="arti-indo">${dictionaryEntry.i}</rt></ruby>`;
+                        }
+                        
                         displayHTMLWords.push(formattedWord);
                     } else {
                         phoneticWords.push(cleanWord);
@@ -319,10 +333,10 @@
 
                 block.innerHTML = `
                     <div class="pr-12">
-                        <p class="text-xl mb-2 text-justify text-gray-900">${finalDisplayHTML}</p>
+                        <p class="text-xl mb-4 text-justify text-gray-900">${finalDisplayHTML}</p>
                         <input type="text" value="${finalPhoneticText}" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 placeholder-gray-300">
                     </div>
-                    <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
+                    <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200 mt-2">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
                 `;
@@ -343,20 +357,12 @@
             }
         }
 
-        // Dark Mode
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const htmlElement = document.documentElement;
-
         themeToggleBtn.addEventListener('click', () => {
             htmlElement.classList.toggle('dark');
-            if (htmlElement.classList.contains('dark')) {
-                themeIcon.classList.remove('fa-moon');
-                themeIcon.classList.add('fa-sun');
-            } else {
-                themeIcon.classList.remove('fa-sun');
-                themeIcon.classList.add('fa-moon');
-            }
+            themeIcon.className = htmlElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
     </script>
 </body>
