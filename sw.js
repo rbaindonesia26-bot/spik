@@ -1,4 +1,4 @@
-const CACHE_NAME = 'spik-pwa-v1';
+const CACHE_NAME = 'spik-pwa-v2';
 const urlsToCache = [
   './',
   './index.html',
