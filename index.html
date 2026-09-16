@@ -60,7 +60,6 @@
             <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Ketik/paste naskah (Inggris atau Indonesia), lalu gunakan pengatur di bawah..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
-                <!-- Tombol Mic -->
                 <button id="btn-mic-en" onclick="toggleListening('en-US')" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm">
                     <i id="mic-icon-en" class="fa-solid fa-ear-listen mr-2"></i> <span id="mic-text-en">Dengar Teman (EN)</span>
                 </button>
@@ -70,7 +69,6 @@
                 
                 <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1"></div>
 
-                <!-- Tombol Baru: Input Teks Indo ke Inggris -->
                 <button id="btn-input-translate" onclick="toggleInputTranslation()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm">
                     <i id="input-translate-icon" class="fa-solid fa-arrow-right-arrow-left mr-2"></i> <span id="input-translate-text">Input Indo (OFF)</span>
                 </button>
@@ -79,7 +77,6 @@
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Buat Naskah
                 </button>
                 
-                <!-- Saklar Visual -->
                 <button id="btn-grammar" onclick="toggleGrammar()" class="bg-purple-600 text-white px-3 py-2 rounded shadow hover:bg-purple-700 transition font-medium flex items-center text-sm">
                     <i id="grammar-icon" class="fa-solid fa-eye mr-2"></i> <span id="grammar-text">Warna Pola (ON)</span>
                 </button>
@@ -92,9 +89,8 @@
                 </button>
             </div>
             
-            <!-- Indikator Loading -->
             <div id="loading-indicator" class="hidden mt-3 text-sm text-blue-600 font-semibold animate-pulse">
-                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang menerjemahkan teks/suara ke bahasa Inggris...
+                <i class="fa-solid fa-spinner fa-spin mr-2"></i> Sedang menerjemahkan teks ke bahasa Inggris...
             </div>
         </div>
 
@@ -139,7 +135,7 @@
             "world": { p: "world", c: "", i: "dunia" }
         };
 
-        // --- SAKLAR TATA BAHASA & MAKNA GANDUL ---
+        // --- SAKLAR ---
         let isGrammarActive = true;
         function toggleGrammar() {
             isGrammarActive = !isGrammarActive;
@@ -179,7 +175,6 @@
             }
         }
 
-        // --- SAKLAR BARU: INPUT INDO KE INGGRIS ---
         let isInputIdToEnActive = false;
         function toggleInputTranslation() {
             isInputIdToEnActive = !isInputIdToEnActive;
@@ -192,6 +187,26 @@
                 document.getElementById('input-translate-text').innerText = "Input Indo (OFF)";
                 btn.classList.replace('bg-pink-600', 'bg-gray-500');
                 btn.classList.replace('hover:bg-pink-700', 'hover:bg-gray-600');
+            }
+        }
+
+        // --- FUNGSI TRANSLATE API GOOGLE (Lebih Kuat & Stabil) ---
+        async function translateIdToEn(text) {
+            try {
+                // Menggunakan endpoint gratis Google Translate yang bisa handle teks panjang
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                let translatedResult = '';
+                // Google memecah kalimat per baris, kita gabungkan kembali
+                data[0].forEach(item => {
+                    if(item[0]) translatedResult += item[0];
+                });
+                return translatedResult;
+            } catch (error) {
+                console.error("Gagal terjemah API:", error);
+                return text; // Kembalikan teks asli jika gagal
             }
         }
 
@@ -214,16 +229,11 @@
                 
                 const textArea = document.getElementById('inputText');
                 
-                // Terjemah otomatis dari Mic Indo ke Inggris
                 if (currentMicMode === 'id-ID') {
                     document.getElementById('loading-indicator').classList.remove('hidden');
-                    try {
-                        const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(currentSpeech)}&langpair=id|en`);
-                        const data = await response.json();
-                        currentSpeech = data.responseData.translatedText;
-                    } catch (error) {
-                        currentSpeech = "(Gagal translate: " + currentSpeech + ")";
-                    }
+                    const translatedSpeech = await translateIdToEn(currentSpeech);
+                    // Jika gagal, beritahu di layar
+                    currentSpeech = translatedSpeech === currentSpeech ? "(Gagal terjemah: " + currentSpeech + ")" : translatedSpeech;
                     document.getElementById('loading-indicator').classList.add('hidden');
                 }
 
@@ -233,7 +243,6 @@
                     textArea.value += '\n' + currentSpeech.trim();
                 }
                 
-                // Bypass translasi teks karena suaranya sudah ditranslasi
                 processText(true); 
             };
             recognition.onend = () => { if (isListening) recognition.start(); };
@@ -290,7 +299,6 @@
         }
 
         // --- PEMROSESAN TEKS & KERTAS ---
-        // Parameter skipTranslation untuk menghindari translasi ganda jika mic Indo sudah bekerja
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -304,18 +312,17 @@
                 return;
             }
 
-            // PROSES TRANSLASI TEKS INDO KE INGGRIS JIKA SAKLAR ON
+            // PROSES TRANSLASI MENGGUNAKAN GOOGLE TRANSLATE API
             if (isInputIdToEnActive && !skipTranslation) {
                 loadingIndicator.classList.remove('hidden');
-                try {
-                    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(rawText)}&langpair=id|en`);
-                    const data = await response.json();
-                    if(data.responseData && data.responseData.translatedText) {
-                         rawText = data.responseData.translatedText;
-                    }
-                } catch (error) {
-                    console.error("Gagal menerjemahkan teks:", error);
+                
+                const translated = await translateIdToEn(rawText);
+                if (translated) {
+                    rawText = translated;
+                } else {
+                    alert("Maaf, koneksi jaringan Anda tidak stabil untuk menerjemahkan. Coba lagi.");
                 }
+                
                 loadingIndicator.classList.add('hidden');
             }
 
