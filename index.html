@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Spik - Naskah Studio</title>
+    <title>Spik - Naskah & Live Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -37,6 +37,7 @@
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen flex flex-col font-sans">
 
+    <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10 flex justify-between items-center">
         <h1 class="text-2xl font-black text-primary tracking-tighter"><i class="fa-solid fa-microphone-lines mr-2"></i>SPIK <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Studio</span></h1>
         <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
@@ -44,31 +45,48 @@
         </button>
     </header>
 
+    <!-- Main Content -->
     <main class="flex-grow w-full max-w-4xl mx-auto p-4 flex flex-col gap-6 mt-4">
         
+        <!-- Panel Kontrol Input -->
         <div id="control-panel" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <label class="block text-sm font-semibold mb-2 dark:text-gray-300"><i class="fa-solid fa-paste mr-2"></i>Paste Naskah Bahasa Inggris di sini:</label>
-            <textarea id="inputText" rows="5" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Contoh: We seek refuge with Him..."></textarea>
+            <div class="flex justify-between items-center mb-2">
+                <label class="block text-sm font-semibold dark:text-gray-300">
+                    <i class="fa-solid fa-file-lines mr-2"></i>Teks Naskah / Hasil Dengar:
+                </label>
+                <!-- Status Mikrofon -->
+                <span id="mic-status" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500">
+                    Mic Siap
+                </span>
+            </div>
+
+            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Ketik/paste naskah, atau aktifkan 'Dengar Percakapan' untuk mendengarkan lawan bicara..."></textarea>
             
             <div class="flex flex-wrap gap-3 mt-4">
+                <!-- Tombol Mic Live Listener -->
+                <button id="btn-mic" onclick="toggleListening()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg shadow transition font-medium flex items-center">
+                    <i id="mic-icon" class="fa-solid fa-microphone mr-2"></i> <span id="mic-text">Dengar Teman (Mic ON)</span>
+                </button>
+
                 <button onclick="processText()" class="bg-primary text-white px-5 py-2.5 rounded-lg shadow hover:bg-blue-600 transition font-medium flex items-center">
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Buat Kertas Naskah
                 </button>
+                
                 <button onclick="window.print()" class="bg-green-600 text-white px-5 py-2.5 rounded-lg shadow hover:bg-green-700 transition font-medium flex items-center">
                     <i class="fa-solid fa-file-pdf mr-2"></i> Cetak / Simpan PDF
                 </button>
             </div>
         </div>
 
+        <!-- Area Kerja Kertas (A4 Style) -->
         <div class="overflow-x-auto pb-8">
             <div id="paper-workspace" class="bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
                 
                 <div class="text-center mb-8 border-b-2 border-gray-800 pb-4 print-hidden">
                     <h2 class="text-3xl font-serif font-bold text-gray-300">AREA KERTAS NASKAH</h2>
-                    <p class="text-sm text-gray-400 mt-2">Naskah Anda akan muncul di sini.</p>
+                    <p class="text-sm text-gray-400 mt-2">Naskah atau suara yang didengar akan muncul di sini.</p>
                 </div>
 
-                <!-- Legenda Warna -->
                 <div id="color-legend" class="hidden mb-6 bg-blue-50 p-3 rounded text-sm print-hidden">
                     <strong>Panduan Warna:</strong> 
                     <span class="text-subject font-bold ml-2">Biru = Subjek (Pelaku)</span>, 
@@ -89,9 +107,7 @@
     </footer>
 
     <script>
-        // --- KAMUS BISPIK VERSI UPGRADE ---
-        // 'p' = phonetic (cara baca)
-        // 'c' = color/type (subject, verb, atau kosong)
+        // --- KAMUS BISPIK INTERNAL ---
         const spikDictionary = {
             "all": { p: "ol", c: "" }, 
             "praise": { p: "preis", c: "" }, 
@@ -127,6 +143,10 @@
             "go": { p: "go", c: "verb" }, 
             "astray": { p: "astrei", c: "" },
             "i": { p: "ai", c: "subject" }, 
+            "you": { p: "yu", c: "subject" },
+            "they": { p: "dei", c: "subject" },
+            "he": { p: "hi", c: "subject" },
+            "she": { p: "syi", c: "subject" },
             "want": { p: "won", c: "verb" }, 
             "learn": { p: "lern", c: "verb" }, 
             "how": { p: "hau", c: "" }, 
@@ -142,6 +162,94 @@
             "it": { p: "it", c: "subject" }
         };
 
+        // --- FITUR SPEECH-TO-TEXT (MENDENGAR TEMAN) ---
+        let recognition = null;
+        let isListening = false;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;          // Mendengarkan terus menerus
+            recognition.interimResults = false;     // Mengambil hasil final per kalimat
+            recognition.lang = 'en-US';             // Setting bahasa tangkapan ke Bahasa Inggris
+
+            recognition.onresult = (event) => {
+                let currentSpeech = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    currentSpeech += event.results[i][0].transcript;
+                }
+                
+                const textArea = document.getElementById('inputText');
+                // Masukkan hasil pendengaran ke textarea
+                if (textArea.value.trim() === '') {
+                    textArea.value = currentSpeech.trim();
+                } else {
+                    textArea.value += '\n' + currentSpeech.trim();
+                }
+                
+                // Otomatis buat naskah dan fonetiknya di kertas
+                processText();
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech Recognition Error: ", event.error);
+                stopListening();
+            };
+
+            recognition.onend = () => {
+                if (isListening) {
+                    recognition.start(); // Pastikan terus aktif jika mode ON
+                }
+            };
+        }
+
+        function toggleListening() {
+            if (!recognition) {
+                alert("Browser Anda belum mendukung fitur pengenalan suara. Disarankan menggunakan Google Chrome atau Microsoft Edge.");
+                return;
+            }
+
+            if (!isListening) {
+                startListening();
+            } else {
+                stopListening();
+            }
+        }
+
+        function startListening() {
+            isListening = true;
+            recognition.start();
+            
+            const btn = document.getElementById('btn-mic');
+            const micText = document.getElementById('mic-text');
+            const micIcon = document.getElementById('mic-icon');
+            const status = document.getElementById('mic-status');
+
+            btn.className = "bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg shadow transition font-medium flex items-center animate-pulse";
+            micText.innerText = "Mendengarkan... (Klik STOP)";
+            micIcon.className = "fa-solid fa-circle-stop mr-2";
+            status.innerText = "Mic AKTIF (Bicara Bahasa Inggris)";
+            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-red-100 text-red-700";
+        }
+
+        function stopListening() {
+            isListening = false;
+            if (recognition) recognition.stop();
+
+            const btn = document.getElementById('btn-mic');
+            const micText = document.getElementById('mic-text');
+            const micIcon = document.getElementById('mic-icon');
+            const status = document.getElementById('mic-status');
+
+            btn.className = "bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg shadow transition font-medium flex items-center";
+            micText.innerText = "Dengar Teman (Mic ON)";
+            micIcon.className = "fa-solid fa-microphone mr-2";
+            status.innerText = "Mic Siap";
+            status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500";
+        }
+
+        // --- PEMROSESAN TEKS & KERTAS NASKAH ---
         function processText() {
             const rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -150,12 +258,11 @@
             docContent.innerHTML = '';
 
             if(!rawText.trim()) {
-                docContent.innerHTML = '<p class="text-center text-gray-400 italic">Silakan masukkan teks terlebih dahulu.</p>';
+                docContent.innerHTML = '<p class="text-center text-gray-400 italic">Silakan masukkan teks atau gunakan tombol Dengar.</p>';
                 colorLegend.classList.add('hidden');
                 return;
             }
 
-            // Tampilkan legenda warna jika ada teks yang diproses
             colorLegend.classList.remove('hidden');
 
             const paragraphs = rawText.split('\n').filter(p => p.trim() !== '');
@@ -164,24 +271,17 @@
                 const block = document.createElement('div');
                 block.className = "relative group";
                 
-                // Variabel untuk menyimpan teks asli (untuk disuarakan)
                 const safeTextToSpeak = para.replace(/'/g, "\\'");
-                
-                // Proses pemisahan kata untuk pewarnaan dan fonetik
                 const rawWords = para.split(/\s+/);
                 let displayHTMLWords = [];
                 let phoneticWords = [];
 
                 rawWords.forEach(rawWord => {
-                    // Bersihkan tanda baca untuk pencarian kamus
                     const cleanWord = rawWord.replace(/[.,?!;:()]/g, "").toLowerCase();
                     const dictionaryEntry = spikDictionary[cleanWord];
 
                     if (dictionaryEntry) {
-                        // 1. Masukkan fonetik
                         phoneticWords.push(dictionaryEntry.p);
-                        
-                        // 2. Beri warna pada teks asli jika ia Subject atau Verb
                         let formattedWord = rawWord;
                         if (dictionaryEntry.c === "subject") {
                             formattedWord = `<span class="text-subject font-bold">${rawWord}</span>`;
@@ -190,7 +290,6 @@
                         }
                         displayHTMLWords.push(formattedWord);
                     } else {
-                        // Jika tidak ada di kamus, biarkan apa adanya
                         phoneticWords.push(cleanWord);
                         displayHTMLWords.push(rawWord);
                     }
@@ -201,12 +300,9 @@
 
                 block.innerHTML = `
                     <div class="pr-12">
-                        <!-- Teks Bahasa Inggris dengan Warna Otomatis -->
                         <p class="text-xl mb-2 text-justify text-gray-900">${finalDisplayHTML}</p>
-                        <!-- Input otomatis terisi fonetik -->
                         <input type="text" value="${finalPhoneticText}" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 placeholder-gray-300">
                     </div>
-                    <!-- Tombol Audio akan membaca teks asli, bukan tag HTML -->
                     <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
@@ -225,11 +321,10 @@
                 utterance.lang = 'en-US';
                 utterance.rate = 0.85; 
                 window.speechSynthesis.speak(utterance);
-            } else {
-                alert("Maaf, browser Anda tidak mendukung fitur suara.");
             }
         }
 
+        // Dark Mode
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const htmlElement = document.documentElement;
