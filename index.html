@@ -81,7 +81,7 @@
                     <i id="grammar-icon" class="fa-solid fa-eye mr-2"></i> <span id="grammar-text">Warna Pola (ON)</span>
                 </button>
                 <button id="btn-translate" onclick="toggleTranslate()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-sm">
-                    <i id="translate-icon" class="fa-solid fa-language mr-2"></i> <span id="translate-text">Makna Gandul (OFF)</span>
+                    <i id="translate-icon" class="fa-solid fa-language mr-2"></i> <span id="translate-text">Makna Gandul (ON)</span>
                 </button>
 
                 <button onclick="window.print()" class="bg-green-600 text-white px-3 py-2 rounded shadow hover:bg-green-700 transition font-medium flex items-center text-sm ml-auto">
@@ -95,7 +95,7 @@
         </div>
 
         <div class="overflow-x-auto pb-8">
-            <div id="paper-workspace" class="grammar-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
+            <div id="paper-workspace" class="grammar-active translate-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
                 
                 <div class="text-center mb-8 border-b-2 border-gray-800 pb-4 print-hidden">
                     <h2 class="text-3xl font-serif font-bold text-gray-300">AREA KERTAS NASKAH</h2>
@@ -113,21 +113,15 @@
 
     <script>
         const spikDictionary = {
-            // Pronouns & Basic
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
             "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
             "it": { p: "it", c: "subject", i: "itu" }, "us": { p: "as", c: "subject", i: "kita" },
-            
-            // To Be & Modals
             "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
             "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
             "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "telah/punya" },
             "been": { p: "bin", c: "verb", i: "telah" }, "can": { p: "ken", c: "verb", i: "bisa" },
-            "will": { p: "wil", c: "verb", i: "akan" },
-            
-            // Khutbah & General Vocab
-            "the": { p: "de", c: "", i: "" }, "a": { p: "e", c: "", i: "seorang/sebuah" },
+            "will": { p: "wil", c: "verb", i: "akan" }, "the": { p: "de", c: "", i: "" }, "a": { p: "e", c: "", i: "seorang/sebuah" },
             "let": { p: "let", c: "verb", i: "mari/biarkan" }, "always": { p: "olweis", c: "", i: "senantiasa" },
             "truly": { p: "truli", c: "", i: "sebenar-benar" }, "devoted": { p: "divotid", c: "verb", i: "bertaqwa" },
             "to": { p: "tu", c: "", i: "kepada" }, "allah": { p: "allah", c: "subject", i: "Allah" },
@@ -154,7 +148,6 @@
             isGrammarActive = !isGrammarActive;
             const workspace = document.getElementById('paper-workspace');
             const btn = document.getElementById('btn-grammar');
-            
             if (isGrammarActive) {
                 workspace.classList.add('grammar-active');
                 document.getElementById('grammar-icon').className = "fa-solid fa-eye mr-2";
@@ -170,7 +163,7 @@
             }
         }
 
-        let isTranslateActive = false;
+        let isTranslateActive = true; // Diatur default ON seperti di gambar
         function toggleTranslate() {
             isTranslateActive = !isTranslateActive;
             const workspace = document.getElementById('paper-workspace');
@@ -208,14 +201,12 @@
                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl=en&dt=t&q=${encodeURIComponent(text)}`;
                 const response = await fetch(url);
                 const data = await response.json();
-                
                 let translatedResult = '';
                 data[0].forEach(item => { if(item[0]) translatedResult += item[0]; });
                 return translatedResult;
             } catch (error) { return text; }
         }
 
-        // --- DUAL MIC SYSTEM ---
         let recognition = null;
         let isListening = false;
         let currentMicMode = '';
@@ -231,22 +222,15 @@
                 for (let i = event.resultIndex; i < event.results.length; ++i) {
                     currentSpeech += event.results[i][0].transcript;
                 }
-                
                 const textArea = document.getElementById('inputText');
-                
                 if (currentMicMode === 'id-ID') {
                     document.getElementById('loading-indicator').classList.remove('hidden');
                     const translatedSpeech = await translateIdToEn(currentSpeech);
                     currentSpeech = translatedSpeech === currentSpeech ? "(Gagal terjemah: " + currentSpeech + ")" : translatedSpeech;
                     document.getElementById('loading-indicator').classList.add('hidden');
                 }
-
-                if (textArea.value.trim() === '') {
-                    textArea.value = currentSpeech.trim();
-                } else {
-                    textArea.value += '\n' + currentSpeech.trim();
-                }
-                
+                if (textArea.value.trim() === '') { textArea.value = currentSpeech.trim(); } 
+                else { textArea.value += '\n' + currentSpeech.trim(); }
                 processText(true); 
             };
             recognition.onend = () => { if (isListening) recognition.start(); };
@@ -257,19 +241,13 @@
             if (isListening) {
                 if (currentMicMode === langCode) { stopListening(); } 
                 else { stopListening(); setTimeout(() => startListening(langCode), 500); }
-            } else {
-                startListening(langCode);
-            }
+            } else { startListening(langCode); }
         }
 
         function startListening(langCode) {
-            isListening = true;
-            currentMicMode = langCode;
-            recognition.lang = langCode;
-            recognition.start();
+            isListening = true; currentMicMode = langCode; recognition.lang = langCode; recognition.start();
             resetMicButtons();
             const status = document.getElementById('mic-status');
-            
             if (langCode === 'en-US') {
                 document.getElementById('btn-mic-en').className = "bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm animate-pulse";
                 document.getElementById('mic-text-en').innerText = "Stop Dengar";
@@ -285,8 +263,7 @@
         }
 
         function stopListening() {
-            isListening = false; currentMicMode = '';
-            if (recognition) recognition.stop();
+            isListening = false; currentMicMode = ''; if (recognition) recognition.stop();
             resetMicButtons();
             const status = document.getElementById('mic-status');
             status.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500";
@@ -302,7 +279,7 @@
             document.getElementById('mic-icon-id').className = "fa-solid fa-microphone-lines mr-2";
         }
 
-        // --- PEMROSESAN TEKS & KERTAS (Penyempurnaan Tanda Baca) ---
+        // --- PEMROSESAN TEKS ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -337,7 +314,6 @@
                 let phoneticWords = [];
 
                 rawWords.forEach(rawWord => {
-                    // Logika Baru: Memisahkan kata inti dengan tanda baca di akhirnya
                     const match = rawWord.match(/^([^.,?!;:()\[\]]*)([.,?!;:()\[\]]*)$/);
                     let coreWord = rawWord;
                     let punctuation = "";
@@ -351,21 +327,16 @@
                     const dictionaryEntry = spikDictionary[cleanWord];
 
                     if (dictionaryEntry) {
-                        // Menempelkan tanda baca kembali ke hasil fonetik
                         phoneticWords.push(dictionaryEntry.p + punctuation);
-                        
                         let formattedWord = coreWord;
                         if (dictionaryEntry.c === "subject") {
                             formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
                         } else if (dictionaryEntry.c === "verb") {
                             formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
                         }
-
                         if (dictionaryEntry.i && dictionaryEntry.i !== "") {
                             formattedWord = `<ruby>${formattedWord}<rt class="arti-indo">${dictionaryEntry.i}</rt></ruby>`;
                         }
-                        
-                        // Menempelkan tanda baca setelah tag html
                         displayHTMLWords.push(formattedWord + punctuation);
                     } else {
                         phoneticWords.push(cleanWord + punctuation);
@@ -376,10 +347,11 @@
                 const finalDisplayHTML = displayHTMLWords.join(" ");
                 const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
 
+                // PENGGANTIAN <INPUT> MENJADI <DIV contenteditable> AGAR TEKS BISA TURUN BARIS (WRAP)
                 block.innerHTML = `
                     <div class="pr-12">
-                        <p class="text-xl mb-4 text-justify text-gray-900">${finalDisplayHTML}</p>
-                        <input type="text" value="${finalPhoneticText}" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 placeholder-gray-300">
+                        <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
+                        <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
                     </div>
                     <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200 mt-2">
                         <i class="fa-solid fa-volume-high"></i>
