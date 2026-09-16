@@ -111,35 +111,94 @@
         </div>
     </main>
 
+    <footer class="text-center p-4 text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden">
+        &copy; 2026 Spik. Baca Inggris Tanpa Meringis.
+    </footer>
+
     <script>
+        // --- KAMUS BISPIK SUPER (Kosakata Inti Sehari-hari) ---
         const spikDictionary = {
+            // 1. Pronouns (Kata Ganti)
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
             "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
-            "it": { p: "it", c: "subject", i: "itu" }, "us": { p: "as", c: "subject", i: "kita" },
+            "it": { p: "it", c: "subject", i: "itu" }, "us": { p: "as", c: "subject", i: "kita/kami" },
+            "me": { p: "mi", c: "", i: "saya" }, "him": { p: "him", c: "", i: "dia(L)" }, 
+            "her": { p: "her", c: "", i: "dia(P)" }, "them": { p: "dem", c: "", i: "mereka" },
+            "my": { p: "mai", c: "", i: "milikku" }, "your": { p: "yor", c: "", i: "milikmu" },
+            "his": { p: "his", c: "", i: "miliknya(L)" }, "our": { p: "aur", c: "", i: "milik kami" },
+            "their": { p: "deir", c: "", i: "milik mereka" },
+
+            // 2. To Be, Modals & Auxiliaries
             "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
-            "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
-            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "telah/punya" },
-            "been": { p: "bin", c: "verb", i: "telah" }, "can": { p: "ken", c: "verb", i: "bisa" },
-            "will": { p: "wil", c: "verb", i: "akan" }, "the": { p: "de", c: "", i: "" }, "a": { p: "e", c: "", i: "seorang/sebuah" },
-            "let": { p: "let", c: "verb", i: "mari/biarkan" }, "always": { p: "olweis", c: "", i: "senantiasa" },
-            "truly": { p: "truli", c: "", i: "sebenar-benar" }, "devoted": { p: "divotid", c: "verb", i: "bertaqwa" },
-            "to": { p: "tu", c: "", i: "kepada" }, "allah": { p: "allah", c: "subject", i: "Allah" },
-            "swt": { p: "es-we-te", c: "", i: "SWT" }, "carry": { p: "keri", c: "verb", i: "melaksanakan" },
-            "out": { p: "aut", c: "", i: "keluar" }, "his": { p: "his", c: "", i: "-Nya" },
-            "commands": { p: "komends", c: "", i: "perintah" }, "and": { p: "en", c: "", i: "dan" },
-            "avoid": { p: "avoid", c: "verb", i: "menjauhi" }, "prohibitions": { p: "prohibisyens", c: "", i: "larangan" },
-            "confirmed": { p: "konfermd", c: "verb", i: "dishahihkan" }, "by": { p: "bai", c: "", i: "oleh" },
-            "ulama": { p: "ulama", c: "", i: "ulama" }, "that": { p: "det", c: "", i: "bahwa" },
-            "when": { p: "wen", c: "", i: "ketika" }, "desires": { p: "dizaiers", c: "verb", i: "menghendaki" },
-            "goodness": { p: "gudnes", c: "", i: "kebaikan" }, "of": { p: "ov", c: "", i: "dari" },
-            "servant": { p: "servent", c: "", i: "hamba" }, "then": { p: "den", c: "", i: "maka/lalu" },
-            "shows": { p: "syous", c: "verb", i: "memperlihatkan" }, "faults": { p: "folts", c: "", i: "aib/kesalahan" },
-            "helps": { p: "helps", c: "verb", i: "menolong" }, "him": { p: "him", c: "", i: "dia" },
-            "make": { p: "meik", c: "verb", i: "membuat" }, "easier": { p: "izier", c: "", i: "mempermudah" },
-            "eliminate": { p: "elimineit", c: "verb", i: "menghilangkan" }, "little": { p: "litel", c: "", i: "sedikit" },
-            "until": { p: "antil", c: "", i: "hingga" }, "becomes": { p: "bikams", c: "verb", i: "menjadi" },
-            "perfect": { p: "perfekt", c: "", i: "sempurna" }
+            "was": { p: "wos", c: "verb", i: "adalah(dulu)" }, "were": { p: "wer", c: "verb", i: "adalah(dulu)" },
+            "do": { p: "du", c: "verb", i: "melakukan" }, "does": { p: "das", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
+            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "telah/punya" }, "had": { p: "hed", c: "verb", i: "telah punya" },
+            "been": { p: "bin", c: "verb", i: "telah" }, "can": { p: "ken", c: "verb", i: "bisa" }, "could": { p: "kud", c: "verb", i: "bisa(dulu)" },
+            "will": { p: "wil", c: "verb", i: "akan" }, "would": { p: "wud", c: "verb", i: "akan" },
+            "should": { p: "syud", c: "verb", i: "seharusnya" }, "must": { p: "mast", c: "verb", i: "harus" },
+
+            // 3. Question Words (5W 1H)
+            "what": { p: "wot", c: "", i: "apa" }, "who": { p: "hu", c: "", i: "siapa" }, 
+            "where": { p: "wer", c: "", i: "dimana" }, "when": { p: "wen", c: "", i: "kapan" }, 
+            "why": { p: "wai", c: "", i: "mengapa" }, "how": { p: "hau", c: "", i: "bagaimana" },
+            "which": { p: "wic", c: "", i: "yang mana" }, "whose": { p: "hus", c: "", i: "milik siapa" },
+
+            // 4. Prepositions & Conjunctions (Kata Depan & Sambung)
+            "in": { p: "in", c: "", i: "di dalam" }, "on": { p: "on", c: "", i: "di atas(nempel)" }, 
+            "at": { p: "et", c: "", i: "di" }, "under": { p: "ander", c: "", i: "di bawah" },
+            "with": { p: "wid", c: "", i: "dengan" }, "without": { p: "widaut", c: "", i: "tanpa" },
+            "for": { p: "for", c: "", i: "untuk" }, "from": { p: "from", c: "", i: "dari" }, 
+            "to": { p: "tu", c: "", i: "ke/untuk" }, "about": { p: "ebaut", c: "", i: "tentang" },
+            "and": { p: "en", c: "", i: "dan" }, "but": { p: "bat", c: "", i: "tetapi" }, 
+            "or": { p: "or", c: "", i: "atau" }, "so": { p: "so", c: "", i: "jadi" },
+            "because": { p: "bikos", c: "", i: "karena" }, "if": { p: "if", c: "", i: "jika" },
+            "that": { p: "det", c: "", i: "bahwa/itu" }, "this": { p: "dis", c: "", i: "ini" },
+            "those": { p: "dos", c: "", i: "itu(jamak)" }, "these": { p: "dis", c: "", i: "ini(jamak)" },
+
+            // 5. Common Verbs (Kata Kerja Utama)
+            "say": { p: "sei", c: "verb", i: "berkata" }, "get": { p: "get", c: "verb", i: "mendapatkan" }, 
+            "make": { p: "meik", c: "verb", i: "membuat" }, "go": { p: "go", c: "verb", i: "pergi" }, 
+            "know": { p: "nou", c: "verb", i: "mengetahui" }, "take": { p: "teik", c: "verb", i: "mengambil" },
+            "see": { p: "si", c: "verb", i: "melihat" }, "come": { p: "kam", c: "verb", i: "datang" }, 
+            "think": { p: "thingk", c: "verb", i: "berpikir" }, "look": { p: "luk", c: "verb", i: "melihat" }, 
+            "want": { p: "won", c: "verb", i: "ingin" }, "give": { p: "giv", c: "verb", i: "memberi" }, 
+            "use": { p: "yus", c: "verb", i: "menggunakan" }, "find": { p: "faind", c: "verb", i: "menemukan" }, 
+            "tell": { p: "tel", c: "verb", i: "menceritakan" }, "ask": { p: "ask", c: "verb", i: "meminta/bertanya" }, 
+            "work": { p: "werk", c: "verb", i: "bekerja" }, "seem": { p: "sim", c: "verb", i: "tampaknya" }, 
+            "feel": { p: "fil", c: "verb", i: "merasa" }, "try": { p: "trai", c: "verb", i: "mencoba" }, 
+            "leave": { p: "liv", c: "verb", i: "meninggalkan" }, "call": { p: "kol", c: "verb", i: "memanggil" },
+            "let": { p: "let", c: "verb", i: "mari/biarkan" }, "carry": { p: "keri", c: "verb", i: "membawa" },
+            "avoid": { p: "avoid", c: "verb", i: "menjauhi" }, "shows": { p: "syous", c: "verb", i: "memperlihatkan" },
+            "helps": { p: "helps", c: "verb", i: "menolong" }, "eliminate": { p: "elimineit", c: "verb", i: "menghilangkan" },
+            "becomes": { p: "bikams", c: "verb", i: "menjadi" }, "seek": { p: "sik", c: "verb", i: "mencari" },
+
+            // 6. Time & Nouns (Waktu & Kata Benda Umum)
+            "now": { p: "nau", c: "", i: "sekarang" }, "today": { p: "tudei", c: "", i: "hari ini" },
+            "tomorrow": { p: "tumorou", c: "", i: "besok" }, "yesterday": { p: "yesterdei", c: "", i: "kemarin" },
+            "day": { p: "dei", c: "", i: "hari" }, "week": { p: "wik", c: "", i: "minggu" },
+            "month": { p: "manth", c: "", i: "bulan" }, "year": { p: "yir", c: "", i: "tahun" },
+            "time": { p: "taim", c: "", i: "waktu" }, "people": { p: "pipel", c: "", i: "orang-orang" },
+            "way": { p: "wei", c: "", i: "jalan/cara" }, "water": { p: "woter", c: "", i: "air" },
+
+            // 7. Articles & Khutbah Specifics
+            "the": { p: "de", c: "", i: "" }, "a": { p: "e", c: "", i: "seorang/sebuah" },
+            "an": { p: "en", c: "", i: "seorang/sebuah" },
+            "allah": { p: "allah", c: "subject", i: "Allah" }, "swt": { p: "es-we-te", c: "", i: "SWT" },
+            "ulama": { p: "ulama", c: "", i: "ulama" }, "servant": { p: "servent", c: "", i: "hamba" },
+            "faults": { p: "folts", c: "", i: "aib/kesalahan" }, "goodness": { p: "gudnes", c: "", i: "kebaikan" },
+            "prohibitions": { p: "prohibisyens", c: "", i: "larangan" }, "commands": { p: "komends", c: "", i: "perintah" },
+            "purity": { p: "pyuriti", c: "", i: "kesucian" }, "praise": { p: "preis", c: "", i: "pujian" },
+            "aid": { p: "eid", c: "", i: "bantuan" }, "forgiveness": { p: "forgivnes", c: "", i: "ampunan" },
+            "testify": { p: "testifai", c: "verb", i: "bersaksi" }, "none": { p: "nan", c: "subject", i: "tiada" },
+            "right": { p: "rait", c: "", i: "hak" }, "worshipped": { p: "worsyipt", c: "verb", i: "disembah" },
+            "except": { p: "eksept", c: "", i: "kecuali" }, "truly": { p: "truli", c: "", i: "sebenar-benar" },
+            "always": { p: "olweis", c: "", i: "senantiasa" }, "devoted": { p: "divotid", c: "verb", i: "bertaqwa" },
+            "out": { p: "aut", c: "", i: "keluar" }, "confirmed": { p: "konfermd", c: "verb", i: "dishahihkan" },
+            "by": { p: "bai", c: "", i: "oleh" }, "desires": { p: "dizaiers", c: "verb", i: "menghendaki" },
+            "of": { p: "ov", c: "", i: "dari" }, "then": { p: "den", c: "", i: "maka/lalu" },
+            "easier": { p: "izier", c: "", i: "mempermudah" }, "little": { p: "litel", c: "", i: "sedikit" },
+            "until": { p: "antil", c: "", i: "hingga" }, "perfect": { p: "perfekt", c: "", i: "sempurna" }
         };
 
         // --- SAKLAR ---
@@ -163,7 +222,7 @@
             }
         }
 
-        let isTranslateActive = true; // Diatur default ON seperti di gambar
+        let isTranslateActive = true; 
         function toggleTranslate() {
             isTranslateActive = !isTranslateActive;
             const workspace = document.getElementById('paper-workspace');
@@ -347,7 +406,6 @@
                 const finalDisplayHTML = displayHTMLWords.join(" ");
                 const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
 
-                // PENGGANTIAN <INPUT> MENJADI <DIV contenteditable> AGAR TEKS BISA TURUN BARIS (WRAP)
                 block.innerHTML = `
                     <div class="pr-12">
                         <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
