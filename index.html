@@ -94,7 +94,6 @@
             </div>
         </div>
 
-        <!-- Area Kerja Kertas -->
         <div class="overflow-x-auto pb-8">
             <div id="paper-workspace" class="grammar-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
                 
@@ -114,25 +113,39 @@
 
     <script>
         const spikDictionary = {
+            // Pronouns & Basic
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
             "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
-            "it": { p: "it", c: "subject", i: "itu" },
+            "it": { p: "it", c: "subject", i: "itu" }, "us": { p: "as", c: "subject", i: "kita" },
+            
+            // To Be & Modals
             "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
             "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
-            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "memiliki" },
-            "the": { p: "de", c: "", i: "" }, "purity": { p: "pyuriti", c: "", i: "kesucian" },
-            "all": { p: "ol", c: "", i: "segala" }, "praise": { p: "preis", c: "", i: "pujian" },
-            "for": { p: "for", c: "", i: "untuk" }, "allah": { p: "allah", c: "subject", i: "Allah" },
-            "him": { p: "him", c: "", i: "Dia" }, "seek": { p: "sik", c: "verb", i: "mencari" },
-            "his": { p: "his", c: "", i: "-Nya" }, "aid": { p: "eid", c: "", i: "bantuan" },
-            "and": { p: "en", c: "", i: "dan" }, "ask": { p: "ask", c: "verb", i: "meminta" },
-            "forgiveness": { p: "forgivnes", c: "", i: "ampunan" }, "testify": { p: "testifai", c: "verb", i: "bersaksi" },
-            "that": { p: "det", c: "", i: "bahwa" }, "none": { p: "nan", c: "subject", i: "tiada" },
-            "right": { p: "rait", c: "", i: "hak" }, "to": { p: "tu", c: "", i: "untuk" },
-            "be": { p: "bi", c: "verb", i: "menjadi" }, "worshipped": { p: "worsyipt", c: "verb", i: "disembah" },
-            "except": { p: "eksept", c: "", i: "kecuali" }, "hello": { p: "helo", c: "", i: "halo" },
-            "world": { p: "world", c: "", i: "dunia" }
+            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "telah/punya" },
+            "been": { p: "bin", c: "verb", i: "telah" }, "can": { p: "ken", c: "verb", i: "bisa" },
+            "will": { p: "wil", c: "verb", i: "akan" },
+            
+            // Khutbah & General Vocab
+            "the": { p: "de", c: "", i: "" }, "a": { p: "e", c: "", i: "seorang/sebuah" },
+            "let": { p: "let", c: "verb", i: "mari/biarkan" }, "always": { p: "olweis", c: "", i: "senantiasa" },
+            "truly": { p: "truli", c: "", i: "sebenar-benar" }, "devoted": { p: "divotid", c: "verb", i: "bertaqwa" },
+            "to": { p: "tu", c: "", i: "kepada" }, "allah": { p: "allah", c: "subject", i: "Allah" },
+            "swt": { p: "es-we-te", c: "", i: "SWT" }, "carry": { p: "keri", c: "verb", i: "melaksanakan" },
+            "out": { p: "aut", c: "", i: "keluar" }, "his": { p: "his", c: "", i: "-Nya" },
+            "commands": { p: "komends", c: "", i: "perintah" }, "and": { p: "en", c: "", i: "dan" },
+            "avoid": { p: "avoid", c: "verb", i: "menjauhi" }, "prohibitions": { p: "prohibisyens", c: "", i: "larangan" },
+            "confirmed": { p: "konfermd", c: "verb", i: "dishahihkan" }, "by": { p: "bai", c: "", i: "oleh" },
+            "ulama": { p: "ulama", c: "", i: "ulama" }, "that": { p: "det", c: "", i: "bahwa" },
+            "when": { p: "wen", c: "", i: "ketika" }, "desires": { p: "dizaiers", c: "verb", i: "menghendaki" },
+            "goodness": { p: "gudnes", c: "", i: "kebaikan" }, "of": { p: "ov", c: "", i: "dari" },
+            "servant": { p: "servent", c: "", i: "hamba" }, "then": { p: "den", c: "", i: "maka/lalu" },
+            "shows": { p: "syous", c: "verb", i: "memperlihatkan" }, "faults": { p: "folts", c: "", i: "aib/kesalahan" },
+            "helps": { p: "helps", c: "verb", i: "menolong" }, "him": { p: "him", c: "", i: "dia" },
+            "make": { p: "meik", c: "verb", i: "membuat" }, "easier": { p: "izier", c: "", i: "mempermudah" },
+            "eliminate": { p: "elimineit", c: "verb", i: "menghilangkan" }, "little": { p: "litel", c: "", i: "sedikit" },
+            "until": { p: "antil", c: "", i: "hingga" }, "becomes": { p: "bikams", c: "verb", i: "menjadi" },
+            "perfect": { p: "perfekt", c: "", i: "sempurna" }
         };
 
         // --- SAKLAR ---
@@ -190,24 +203,16 @@
             }
         }
 
-        // --- FUNGSI TRANSLATE API GOOGLE (Lebih Kuat & Stabil) ---
         async function translateIdToEn(text) {
             try {
-                // Menggunakan endpoint gratis Google Translate yang bisa handle teks panjang
                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl=en&dt=t&q=${encodeURIComponent(text)}`;
                 const response = await fetch(url);
                 const data = await response.json();
                 
                 let translatedResult = '';
-                // Google memecah kalimat per baris, kita gabungkan kembali
-                data[0].forEach(item => {
-                    if(item[0]) translatedResult += item[0];
-                });
+                data[0].forEach(item => { if(item[0]) translatedResult += item[0]; });
                 return translatedResult;
-            } catch (error) {
-                console.error("Gagal terjemah API:", error);
-                return text; // Kembalikan teks asli jika gagal
-            }
+            } catch (error) { return text; }
         }
 
         // --- DUAL MIC SYSTEM ---
@@ -232,7 +237,6 @@
                 if (currentMicMode === 'id-ID') {
                     document.getElementById('loading-indicator').classList.remove('hidden');
                     const translatedSpeech = await translateIdToEn(currentSpeech);
-                    // Jika gagal, beritahu di layar
                     currentSpeech = translatedSpeech === currentSpeech ? "(Gagal terjemah: " + currentSpeech + ")" : translatedSpeech;
                     document.getElementById('loading-indicator').classList.add('hidden');
                 }
@@ -298,7 +302,7 @@
             document.getElementById('mic-icon-id').className = "fa-solid fa-microphone-lines mr-2";
         }
 
-        // --- PEMROSESAN TEKS & KERTAS ---
+        // --- PEMROSESAN TEKS & KERTAS (Penyempurnaan Tanda Baca) ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -312,17 +316,10 @@
                 return;
             }
 
-            // PROSES TRANSLASI MENGGUNAKAN GOOGLE TRANSLATE API
             if (isInputIdToEnActive && !skipTranslation) {
                 loadingIndicator.classList.remove('hidden');
-                
                 const translated = await translateIdToEn(rawText);
-                if (translated) {
-                    rawText = translated;
-                } else {
-                    alert("Maaf, koneksi jaringan Anda tidak stabil untuk menerjemahkan. Coba lagi.");
-                }
-                
+                if (translated) rawText = translated;
                 loadingIndicator.classList.add('hidden');
             }
 
@@ -340,25 +337,38 @@
                 let phoneticWords = [];
 
                 rawWords.forEach(rawWord => {
-                    const cleanWord = rawWord.replace(/[.,?!;:()\[\]]/g, "").toLowerCase();
+                    // Logika Baru: Memisahkan kata inti dengan tanda baca di akhirnya
+                    const match = rawWord.match(/^([^.,?!;:()\[\]]*)([.,?!;:()\[\]]*)$/);
+                    let coreWord = rawWord;
+                    let punctuation = "";
+                    
+                    if (match) {
+                        coreWord = match[1];
+                        punctuation = match[2];
+                    }
+
+                    const cleanWord = coreWord.toLowerCase();
                     const dictionaryEntry = spikDictionary[cleanWord];
 
                     if (dictionaryEntry) {
-                        phoneticWords.push(dictionaryEntry.p);
-                        let formattedWord = rawWord;
+                        // Menempelkan tanda baca kembali ke hasil fonetik
+                        phoneticWords.push(dictionaryEntry.p + punctuation);
                         
+                        let formattedWord = coreWord;
                         if (dictionaryEntry.c === "subject") {
-                            formattedWord = `<span class="tag-subject" title="Subjek">${rawWord}</span>`;
+                            formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
                         } else if (dictionaryEntry.c === "verb") {
-                            formattedWord = `<span class="tag-verb" title="Kata Kerja">${rawWord}</span>`;
+                            formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
                         }
 
                         if (dictionaryEntry.i && dictionaryEntry.i !== "") {
                             formattedWord = `<ruby>${formattedWord}<rt class="arti-indo">${dictionaryEntry.i}</rt></ruby>`;
                         }
-                        displayHTMLWords.push(formattedWord);
+                        
+                        // Menempelkan tanda baca setelah tag html
+                        displayHTMLWords.push(formattedWord + punctuation);
                     } else {
-                        phoneticWords.push(cleanWord);
+                        phoneticWords.push(cleanWord + punctuation);
                         displayHTMLWords.push(rawWord);
                     }
                 });
