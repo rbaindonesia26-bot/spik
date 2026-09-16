@@ -19,12 +19,9 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Pengaturan Khusus untuk Print / Download PDF */
         @media print {
             body { background-color: white !important; }
-            /* Sembunyikan elemen yang tidak perlu diprint */
             header, #control-panel, .print-hidden, footer { display: none !important; }
-            /* Format Kertas */
             #paper-workspace {
                 box-shadow: none !important;
                 margin: 0 !important;
@@ -32,14 +29,12 @@
                 max-width: 100% !important;
                 background-color: transparent !important;
             }
-            /* Hilangkan garis input saat diprint */
             .phonetic-input { border: none !important; color: #4b5563 !important; }
         }
     </style>
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen flex flex-col font-sans">
 
-    <!-- Header -->
     <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10 flex justify-between items-center">
         <h1 class="text-2xl font-black text-primary tracking-tighter"><i class="fa-solid fa-microphone-lines mr-2"></i>SPIK <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Studio</span></h1>
         <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
@@ -47,10 +42,8 @@
         </button>
     </header>
 
-    <!-- Main Content -->
     <main class="flex-grow w-full max-w-4xl mx-auto p-4 flex flex-col gap-6 mt-4">
         
-        <!-- Panel Kontrol (Input Teks) -->
         <div id="control-panel" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <label class="block text-sm font-semibold mb-2 dark:text-gray-300"><i class="fa-solid fa-paste mr-2"></i>Paste Naskah Bahasa Inggris di sini:</label>
             <textarea id="inputText" rows="5" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Contoh: Ladies and gentlemen, it is an honor to stand before you today..."></textarea>
@@ -65,9 +58,7 @@
             </div>
         </div>
 
-        <!-- Area Kerja Kertas (A4 Style) -->
         <div class="overflow-x-auto pb-8">
-            <!-- Container berwujud Kertas -->
             <div id="paper-workspace" class="bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
                 
                 <div class="text-center mb-8 border-b-2 border-gray-800 pb-4 print-hidden">
@@ -89,36 +80,64 @@
     </footer>
 
     <script>
+        // --- KAMUS BISPIK (Database Internal) ---
+        // Anda bisa terus menambahkan kata baru di sini tanpa batas!
+        const spikDictionary = {
+            "all": "ol", "praise": "preis", "is": "is", "due": "du", "to": "tu",
+            "allah": "allah", "we": "wi", "him": "him", "seek": "sik", "for": "for",
+            "his": "his", "assistance": "asistens", "and": "en", "forgiveness": "forgivnes",
+            "refuge": "refyuj", "with": "wid", "from": "from", "evils": "ivels",
+            "of": "ov", "our": "aur", "souls": "souls", "misdeeds": "misdids",
+            "no": "no", "one": "wan", "can": "ken", "mislead": "mislid",
+            "whosoever": "husoeber", "guides": "gaids", "none": "nan", "guide": "gaid",
+            "causes": "koses", "go": "go", "astray": "astrei",
+            "i": "ai", "want": "won", "learn": "lern", "how": "hau", "speak": "spik",
+            "english": "ingglis", "naturally": "necereli", "the": "de", "weather": "weder",
+            "rough": "raf", "will": "wil", "walk": "wok", "through": "thru", "it": "it"
+        };
+
+        // Fungsi menerjemahkan teks ke fonetik
+        function translateToPhonetic(text) {
+            // Hilangkan tanda baca untuk pencarian di kamus
+            const cleanText = text.replace(/[.,?!;:()]/g, "").toLowerCase();
+            const words = cleanText.split(/\s+/);
+            
+            const translatedWords = words.map(word => {
+                // Jika kata ada di kamus, gunakan terjemahannya. Jika tidak, biarkan kata aslinya (atau beri tanda)
+                return spikDictionary[word] ? spikDictionary[word] : word;
+            });
+
+            return "/ " + translatedWords.join(" ") + " /";
+        }
+
         function processText() {
             const rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
             
-            // Hapus isi sebelumnya
             docContent.innerHTML = '';
 
             if(!rawText.trim()) {
-                docContent.innerHTML = '<p class="text-center text-gray-400 italic">Silakan masukkan teks terlebih dahulu di kolom atas.</p>';
+                docContent.innerHTML = '<p class="text-center text-gray-400 italic">Silakan masukkan teks terlebih dahulu.</p>';
                 return;
             }
 
-            // Pecah teks berdasarkan enter/baris baru
             const paragraphs = rawText.split('\n').filter(p => p.trim() !== '');
 
             paragraphs.forEach((para, index) => {
                 const block = document.createElement('div');
                 block.className = "relative group";
                 
-                // Escape petik tunggal agar tidak error di onclick JS
                 const safeText = para.replace(/'/g, "\\'");
+                
+                // Terjemahkan paragraf secara otomatis
+                const phoneticText = translateToPhonetic(para);
 
                 block.innerHTML = `
                     <div class="pr-12">
-                        <!-- Teks Bahasa Inggris Asli -->
                         <p class="text-xl font-bold mb-2 text-justify">${para}</p>
-                        <!-- Input untuk mengetik fonetik -->
-                        <input type="text" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 placeholder-gray-300" placeholder="/ Ketik panduan baca Anda di sini... /">
+                        <!-- Input otomatis terisi dari hasil terjemahan -->
+                        <input type="text" value="${phoneticText}" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 placeholder-gray-300">
                     </div>
-                    <!-- Tombol Audio (Sembunyi saat diprint) -->
                     <button onclick="playAudio('${safeText}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
                         <i class="fa-solid fa-volume-high"></i>
                     </button>
@@ -126,7 +145,6 @@
                 docContent.appendChild(block);
             });
 
-            // Hilangkan judul placeholder kertas jika teks berhasil diproses
             const paperHeader = document.querySelector('#paper-workspace .print-hidden.border-b-2');
             if(paperHeader) paperHeader.style.display = 'none';
         }
@@ -143,7 +161,6 @@
             }
         }
 
-        // Fitur Dark Mode (Kertas tetap berlatar putih seperti aslinya, panel yang gelap)
         const themeToggleBtn = document.getElementById('theme-toggle');
         const themeIcon = document.getElementById('theme-icon');
         const htmlElement = document.documentElement;
