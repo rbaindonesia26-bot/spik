@@ -23,8 +23,8 @@
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 
     <style>
-        .grammar-active .tag-subject { color: #2563eb; font-weight: 700; cursor: help; border-bottom: 2px dotted #2563eb; transition: all 0.2s; }
-        .grammar-active .tag-verb { color: #dc2626; font-weight: 700; cursor: help; border-bottom: 2px dotted #dc2626; transition: all 0.2s; }
+        .grammar-active .tag-subject { color: #2563eb; font-weight: 700; border-bottom: 2px dotted #2563eb; transition: all 0.2s; }
+        .grammar-active .tag-verb { color: #dc2626; font-weight: 700; border-bottom: 2px dotted #dc2626; transition: all 0.2s; }
         .dark .grammar-active .tag-subject { color: #60a5fa; border-bottom-color: #60a5fa; }
         .dark .grammar-active .tag-verb { color: #f87171; border-bottom-color: #f87171; }
 
@@ -43,9 +43,7 @@
             filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.15)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.1));
             display: inline-block;
         }
-        .dark .logo-3d-wrapper {
-            filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.5));
-        }
+        .dark .logo-3d-wrapper { filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.5)); }
         .logo-gradient-text {
             background: linear-gradient(45deg, #0ea5e9, #8b5cf6, #ec4899, #f43f5e);
             -webkit-background-clip: text;
@@ -53,6 +51,9 @@
             background-clip: text;
             color: transparent;
         }
+
+        /* Penyesuaian agar teks panjang tidak tumpah di HP */
+        .text-break-safe { word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
 
         @media print {
             body { background-color: white !important; }
@@ -65,18 +66,18 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen flex flex-col font-sans">
+<body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen flex flex-col font-sans overflow-x-hidden">
 
-    <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+    <header class="bg-white dark:bg-gray-800 shadow-md p-3 sm:p-4 sticky top-0 z-10 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
         <div class="logo-3d-wrapper hover:scale-105 transition-transform duration-300 cursor-default">
-            <h1 class="text-3xl font-black tracking-tighter logo-gradient-text pb-1">
-                <i class="fa-solid fa-plane-departure mr-2"></i>SPIK <span class="text-lg font-extrabold tracking-normal opacity-90 ml-1">Travel</span>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tighter logo-gradient-text pb-1">
+                <i class="fa-solid fa-plane-departure mr-1 sm:mr-2"></i>SPIK <span class="text-sm sm:text-lg font-extrabold tracking-normal opacity-90 ml-1">Travel</span>
             </h1>
         </div>
         
-        <div class="flex items-center gap-3">
-            <button id="install-btn" class="hidden bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow transition font-medium flex items-center text-sm">
-                <i class="fa-solid fa-download mr-1"></i> Install App
+        <div class="flex items-center gap-2 sm:gap-3">
+            <button id="install-btn" class="hidden bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
+                <i class="fa-solid fa-download mr-1"></i> Install
             </button>
             <button id="theme-toggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
                 <i id="theme-icon" class="fa-solid fa-moon"></i>
@@ -84,30 +85,30 @@
         </div>
     </header>
 
-    <main class="flex-grow w-full max-w-6xl mx-auto p-4 flex flex-col gap-6 mt-4">
+    <main class="flex-grow w-full max-w-6xl mx-auto p-2 sm:p-4 flex flex-col gap-4 sm:gap-6 mt-2 sm:mt-4">
         
-        <div id="control-panel" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+        <div id="control-panel" class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
-                <label class="block text-sm font-semibold dark:text-gray-300">
+                <label class="block text-xs sm:text-sm font-semibold dark:text-gray-300">
                     <i class="fa-solid fa-comments mr-2"></i>Area Percakapan & Naskah:
                 </label>
                 
                 <div class="flex items-center gap-2">
                     <input type="file" id="file-upload" class="hidden" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handleFileUpload(event)">
-                    <button onclick="document.getElementById('file-upload').click()" class="text-xs font-semibold px-3 py-1.5 rounded bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 text-indigo-700 dark:text-indigo-300 transition flex items-center cursor-pointer shadow-sm border border-indigo-200 dark:border-indigo-700">
-                        <i class="fa-solid fa-file-arrow-up mr-1"></i> Upload File
+                    <button onclick="document.getElementById('file-upload').click()" class="text-xs font-semibold px-2 sm:px-3 py-1.5 rounded bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 text-indigo-700 dark:text-indigo-300 transition flex items-center cursor-pointer shadow-sm border border-indigo-200 dark:border-indigo-700">
+                        <i class="fa-solid fa-file-arrow-up mr-1"></i> Upload
                     </button>
 
-                    <span id="mic-status" class="text-xs font-semibold px-2.5 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 shadow-sm border border-gray-200 dark:border-gray-600">
+                    <span id="mic-status" class="text-xs font-semibold px-2 py-1.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 shadow-sm border border-gray-200 dark:border-gray-600">
                         Mic Siap
                     </span>
                 </div>
             </div>
 
-            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Bicara lewat mic, atau ketik teks di sini (Gunakan TITIK untuk pemisah kalimat)..."></textarea>
+            <textarea id="inputText" rows="4" class="w-full p-3 sm:p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y text-sm sm:text-base" placeholder="Bicara lewat mic, atau paste teks naskah di sini..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
-                <select id="travel-phrases" onchange="insertTravelPhrase()" class="bg-rose-600 text-white px-3 py-2 rounded shadow font-medium text-sm outline-none cursor-pointer">
+                <select id="travel-phrases" onchange="insertTravelPhrase()" class="bg-rose-600 text-white px-3 py-2 rounded shadow font-medium text-xs sm:text-sm outline-none cursor-pointer w-full sm:w-auto">
                     <option value="">🆘 Frasa Darurat Offline</option>
                     <option value="I need help, please. (Saya butuh bantuan.)">Minta Bantuan</option>
                     <option value="Where is the toilet? (Dimana toilet?)">Tanya Toilet</option>
@@ -119,62 +120,66 @@
                     <option value="I want to buy food. (Saya ingin membeli makanan.)">Beli Makanan</option>
                 </select>
 
-                <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 hidden md:block"></div>
+                <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
 
-                <button id="btn-mic-en" onclick="toggleListening('en-US')" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm">
-                    <i id="mic-icon-en" class="fa-solid fa-ear-listen mr-2"></i> <span id="mic-text-en">Dengar Bule (EN)</span>
+                <button id="btn-mic-en" onclick="toggleListening('en-US')" class="flex-1 sm:flex-none justify-center bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
+                    <i id="mic-icon-en" class="fa-solid fa-ear-listen mr-1 sm:mr-2"></i> <span id="mic-text-en">Dengar (EN)</span>
                 </button>
-                <button id="btn-mic-id" onclick="toggleListening('id-ID')" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm">
-                    <i id="mic-icon-id" class="fa-solid fa-microphone-lines mr-2"></i> <span id="mic-text-id">Bicara Indo (ID)</span>
-                </button>
-                
-                <div class="h-6 w-px bg-gray-300 dark:bg-gray-600 mx-1 hidden md:block"></div>
-
-                <button id="btn-input-translate" onclick="toggleInputTranslation()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm" title="Jika ON, teks Indo yang diketik akan jadi Inggris">
-                    <i id="input-translate-icon" class="fa-solid fa-arrow-right-arrow-left mr-2"></i> <span id="input-translate-text">Ketik Indo (OFF)</span>
+                <button id="btn-mic-id" onclick="toggleListening('id-ID')" class="flex-1 sm:flex-none justify-center bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
+                    <i id="mic-icon-id" class="fa-solid fa-microphone-lines mr-1 sm:mr-2"></i> <span id="mic-text-id">Bicara (ID)</span>
                 </button>
 
-                <button onclick="processText()" class="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition font-medium flex items-center text-sm">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Tampilkan
+                <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
+
+                <button id="btn-input-translate" onclick="toggleInputTranslation()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm" title="Jika ON, teks Indo yang diketik akan jadi Inggris">
+                    <i id="input-translate-icon" class="fa-solid fa-arrow-right-arrow-left mr-1 sm:mr-2"></i> <span id="input-translate-text">Ketik Indo (OFF)</span>
+                </button>
+
+                <button onclick="processText()" class="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition font-medium flex items-center text-xs sm:text-sm">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1 sm:mr-2"></i> Tampilkan
                 </button>
                 
-                <button onclick="clearText()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-sm" title="Hapus semua teks">
-                    <i class="fa-solid fa-trash-can mr-2"></i> Bersihkan
+                <button onclick="clearText()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-xs sm:text-sm" title="Hapus semua teks">
+                    <i class="fa-solid fa-trash-can mr-1 sm:mr-2"></i> Bersihkan
                 </button>
+
+                <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
                 
-                <button id="btn-grammar" onclick="toggleGrammar()" class="bg-purple-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm print-hidden ml-auto md:ml-0">
-                    <i id="grammar-icon" class="fa-solid fa-eye mr-2"></i> <span id="grammar-text">Pola (ON)</span>
-                </button>
-                <button id="btn-translate" onclick="toggleTranslate()" class="bg-teal-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm print-hidden">
-                    <i id="translate-icon" class="fa-solid fa-language mr-2"></i> <span id="translate-text">Makna (ON)</span>
-                </button>
-                <button id="btn-phonetic" onclick="togglePhonetic()" class="bg-sky-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm print-hidden">
-                    <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-2"></i> <span id="phonetic-text">Bacaan (ON)</span>
-                </button>
+                <div class="flex gap-2 print-hidden w-full sm:w-auto mt-2 sm:mt-0">
+                    <button id="btn-grammar" onclick="toggleGrammar()" class="flex-1 sm:flex-none justify-center bg-purple-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
+                        <i id="grammar-icon" class="fa-solid fa-eye mr-1"></i> <span id="grammar-text">Pola (ON)</span>
+                    </button>
+                    <button id="btn-translate" onclick="toggleTranslate()" class="flex-1 sm:flex-none justify-center bg-teal-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
+                        <i id="translate-icon" class="fa-solid fa-language mr-1"></i> <span id="translate-text">Makna (ON)</span>
+                    </button>
+                    <button id="btn-phonetic" onclick="togglePhonetic()" class="flex-1 sm:flex-none justify-center bg-sky-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
+                        <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-1"></i> <span id="phonetic-text">Bacaan (ON)</span>
+                    </button>
+                </div>
             </div>
             
-            <div id="loading-indicator" class="hidden mt-3 text-sm text-blue-600 font-semibold animate-pulse">
+            <div id="loading-indicator" class="hidden mt-3 text-xs sm:text-sm text-blue-600 font-semibold animate-pulse">
                 <i id="loading-icon" class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="loading-text">Menerjemahkan... (Butuh Sinyal Internet)</span>
             </div>
         </div>
 
-        <div class="overflow-x-auto pb-8">
-            <div id="paper-workspace" class="grammar-active translate-active phonetic-active bg-white text-gray-900 mx-auto p-10 md:p-16 shadow-lg rounded-sm w-full max-w-[21cm] min-h-[29.7cm] border border-gray-300 dark:border-none transition-none relative">
+        <div class="w-full pb-8">
+            <!-- PADDING DI HP DIPERKECIL (p-4) AGAR TEKS TIDAK SEMPIT -->
+            <div id="paper-workspace" class="grammar-active translate-active phonetic-active bg-white text-gray-900 mx-auto p-4 sm:p-8 md:p-12 shadow-lg rounded-sm w-full max-w-[21cm] border border-gray-300 dark:border-none transition-none relative overflow-hidden">
                 
-                <div id="color-legend" class="hidden mb-6 bg-blue-50 p-3 rounded text-sm print-hidden flex flex-wrap gap-4 justify-between items-center border border-blue-100">
+                <div id="color-legend" class="hidden mb-6 bg-blue-50 p-2 sm:p-3 rounded text-xs sm:text-sm print-hidden flex flex-wrap gap-2 sm:gap-4 justify-between items-center border border-blue-100">
                     <div><strong>Petunjuk:</strong> <span class="text-blue-600 font-bold ml-1">Biru = Subjek</span> | <span class="text-red-600 font-bold">Merah = Kata Kerja</span></div>
-                    <div class="text-emerald-600 font-bold"><i class="fa-solid fa-language"></i> Hijau = Makna Gandul</div>
+                    <div class="text-emerald-600 font-bold"><i class="fa-solid fa-language"></i> Hijau = Makna</div>
                 </div>
 
-                <div id="document-content" class="space-y-8 font-serif text-xl leading-relaxed"></div>
+                <div id="document-content" class="space-y-6 sm:space-y-8 font-serif text-lg sm:text-xl leading-relaxed"></div>
             </div>
         </div>
     </main>
 
-    <footer class="text-center p-4 text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden flex justify-center items-center gap-4">
+    <footer class="text-center p-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden flex flex-col sm:flex-row justify-center items-center gap-3">
         <span>&copy; 2026 Spik. Travel Edition.</span>
-        <!-- TOMBOL RESET CACHE PAKSA -->
-        <button onclick="forceHardReset()" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-full font-bold transition shadow-sm border border-red-200">
+        <button onclick="forceHardReset()" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-full font-bold transition shadow-sm border border-red-200">
             <i class="fa-solid fa-rotate-right mr-1"></i> Fix Tampilan Nyangkut
         </button>
     </footer>
@@ -281,7 +286,6 @@
             "thousand": { p: "thauzen", c: "", i: "ribu" }, "million": { p: "milyen", c: "", i: "juta" }
         };
 
-        // --- FUNGSI RESET CACHE OTOMATIS ---
         function forceHardReset() {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.getRegistrations().then(function(registrations) {
@@ -291,7 +295,7 @@
             caches.keys().then(function(names) {
                 for (let name of names) caches.delete(name);
             });
-            alert('Sistem berhasil di-reset. Mengambil versi terbaru...');
+            alert('Sistem sedang di-reset. Mohon tunggu...');
             window.location.href = window.location.pathname + '?v=' + new Date().getTime();
         }
 
@@ -485,11 +489,11 @@
             resetMicButtons();
             const status = document.getElementById('mic-status');
             if (langCode === 'en-US') {
-                document.getElementById('btn-mic-en').className = "bg-red-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm animate-pulse";
+                document.getElementById('btn-mic-en').className = "flex-1 sm:flex-none justify-center bg-red-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm animate-pulse";
                 document.getElementById('mic-text-en').innerText = "Stop Dengar";
-                status.innerText = "Mendengar Bule (Butuh Internet)";
+                status.innerText = "Mendengar (Butuh Internet)";
             } else {
-                document.getElementById('btn-mic-id').className = "bg-red-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm animate-pulse";
+                document.getElementById('btn-mic-id').className = "flex-1 sm:flex-none justify-center bg-red-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm animate-pulse";
                 document.getElementById('mic-text-id').innerText = "Stop Bicara";
                 status.innerText = "Merekam Suara Anda";
             }
@@ -505,13 +509,13 @@
         }
 
         function resetMicButtons() {
-            document.getElementById('btn-mic-en').className = "bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm";
-            document.getElementById('mic-text-en').innerText = "Dengar Bule (EN)";
-            document.getElementById('btn-mic-id').className = "bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-sm";
-            document.getElementById('mic-text-id').innerText = "Bicara Indo (ID)";
+            document.getElementById('btn-mic-en').className = "flex-1 sm:flex-none justify-center bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm";
+            document.getElementById('mic-text-en').innerText = "Dengar (EN)";
+            document.getElementById('btn-mic-id').className = "flex-1 sm:flex-none justify-center bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm";
+            document.getElementById('mic-text-id').innerText = "Bicara (ID)";
         }
 
-        // --- SISTEM PEMOTONG KALIMAT PERMANEN ---
+        // --- SISTEM PEMOTONG SUPER (Titik, Koma, Tanya, Seru) ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -535,15 +539,15 @@
             let partCounter = 1;
 
             paragraphs.forEach((para) => {
-                // Memecah berdasarkan titik, tanda seru, atau tanda tanya
-                const sentences = para.match(/[^.?!]+[.?!]+(?:\s|$)\vert{}[^.?!]+$/g) || [para];
+                // Memecah berdasarkan TITIK (.), KOMA (,), TANDA TANYA (?), TANDA SERU (!), atau TITIK KOMA (;)
+                const sentences = para.match(/[^.,?!;]+[.,?!;]+(?:\s|$)\vert{}[^.,?!;]+$/g) || [para];
 
                 sentences.forEach((sentence) => {
                     const trimmedSentence = sentence.trim();
                     if(!trimmedSentence) return;
 
                     const block = document.createElement('div');
-                    block.className = "relative group mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"; 
+                    block.className = "relative group mb-4 border-b border-gray-200 dark:border-gray-700 pb-3"; 
                     
                     const translationMatch = trimmedSentence.match(/<Terjemahan:\s*(.*?)>/);
                     if(translationMatch) {
@@ -585,15 +589,16 @@
                     const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
 
                     block.innerHTML = `
-                        <div class="pr-12">
-                            <span class="text-xs text-blue-500 font-bold mb-1 block print-hidden"><i class="fa-solid fa-list-ol mr-1"></i> Bagian ${partCounter}</span>
-                            <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
+                        <!-- Ruang di kanan (pr-10) untuk menghindari tombol speaker menutupi teks di HP -->
+                        <div class="pr-10 sm:pr-12 text-break-safe">
+                            <span class="text-[10px] sm:text-xs text-blue-500 font-bold mb-1 block print-hidden"><i class="fa-solid fa-list-ol mr-1"></i> Potongan ${partCounter}</span>
+                            <p class="text-lg sm:text-xl mb-2 text-justify text-gray-900">${finalDisplayHTML}</p>
                             <div class="phonetic-input-wrapper">
-                                <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent focus:outline-none outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
+                                <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-base sm:text-lg bg-transparent focus:outline-none outline-none pb-1 text-break-safe leading-relaxed">${finalPhoneticText}</div>
                             </div>
                         </div>
-                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-4 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
-                            <i class="fa-solid fa-volume-high"></i>
+                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-2 right-0 w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
+                            <i class="fa-solid fa-volume-high text-xs sm:text-base"></i>
                         </button>
                     `;
                     docContent.appendChild(block);
