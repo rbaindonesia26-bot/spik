@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Bicara lewat mic, atau ketik teks di sini..."></textarea>
+            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Bicara lewat mic, atau ketik teks di sini (Gunakan titik untuk memisahkan kalimat)..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
                 <select id="travel-phrases" onchange="insertTravelPhrase()" class="bg-rose-600 text-white px-3 py-2 rounded shadow font-medium text-sm outline-none cursor-pointer">
@@ -183,7 +183,6 @@
             "me": { p: "mi", c: "", i: "saya" }, "him": { p: "him", c: "", i: "dia(L)" }, 
             "them": { p: "dem", c: "", i: "mereka" }, "my": { p: "mai", c: "", i: "milikku" }, 
             "your": { p: "yor", c: "", i: "milikmu" }, "our": { p: "aur", c: "", i: "milik kami" },
-            
             "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
             "was": { p: "wos", c: "verb", i: "adalah(lalu)" }, "were": { p: "wer", c: "verb", i: "adalah(lalu)" },
             "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
@@ -191,7 +190,6 @@
             "can": { p: "ken", c: "verb", i: "bisa" }, "could": { p: "kud", c: "verb", i: "bisa(lalu)" },
             "will": { p: "wil", c: "verb", i: "akan" }, "would": { p: "wud", c: "verb", i: "akan" },
             "must": { p: "mast", c: "verb", i: "harus" }, "need": { p: "nid", c: "verb", i: "butuh" }, "should": { p: "syud", c: "verb", i: "seharusnya" },
-            
             "what": { p: "wot", c: "", i: "apa" }, "who": { p: "hu", c: "", i: "siapa" }, 
             "where": { p: "wer", c: "", i: "dimana" }, "when": { p: "wen", c: "", i: "kapan" }, 
             "why": { p: "wai", c: "", i: "kenapa" }, "how": { p: "hau", c: "", i: "bagaimana" }, 
@@ -202,7 +200,6 @@
             "to": { p: "tu", c: "", i: "ke/untuk" }, "and": { p: "en", c: "", i: "dan" }, 
             "but": { p: "bat", c: "", i: "tetapi" }, "because": { p: "bikos", c: "", i: "karena" },
             "that": { p: "det", c: "", i: "bahwa/itu" }, "this": { p: "dis", c: "", i: "ini" },
-            
             "go": { p: "go", c: "verb", i: "pergi" }, "want": { p: "won", c: "verb", i: "ingin" },
             "buy": { p: "bai", c: "verb", i: "beli" }, "take": { p: "teik", c: "verb", i: "mengambil" },
             "come": { p: "kam", c: "verb", i: "datang" }, "look": { p: "luk", c: "verb", i: "melihat" },
@@ -218,7 +215,6 @@
             "leave": { p: "liv", c: "verb", i: "pergi/sisa" }, "call": { p: "kol", c: "verb", i: "memanggil" },
             "preach": { p: "pric", c: "verb", i: "berdakwah" }, "pray": { p: "prei", c: "verb", i: "berdoa/shalat" },
             "speak": { p: "spik", c: "verb", i: "berbicara" }, "listen": { p: "lisen", c: "verb", i: "mendengar" },
-            
             "went": { p: "went", c: "verb", i: "pergi(lalu)" }, "wanted": { p: "wontid", c: "verb", i: "ingin(lalu)" },
             "bought": { p: "bot", c: "verb", i: "beli(lalu)" }, "took": { p: "tuk", c: "verb", i: "mengambil(lalu)" },
             "came": { p: "keim", c: "verb", i: "datang(lalu)" }, "looked": { p: "lukt", c: "verb", i: "melihat(lalu)" },
@@ -233,7 +229,6 @@
             "tried": { p: "traid", c: "verb", i: "mencoba(lalu)" }, "left": { p: "left", c: "verb", i: "pergi(lalu)" },
             "called": { p: "kold", c: "verb", i: "memanggil(lalu)" }, "preached": { p: "prict", c: "verb", i: "berdakwah(lalu)" },
             "prayed": { p: "preid", c: "verb", i: "berdoa(lalu)" }, "spoke": { p: "spouk", c: "verb", i: "berbicara(lalu)" },
-            
             "papua": { p: "papua", c: "", i: "Papua" }, "new": { p: "nyu", c: "", i: "Baru" }, "guinea": { p: "gini", c: "", i: "Nugini" },
             "kina": { p: "kina", c: "", i: "Kina (Uang)" }, "toea": { p: "toya", c: "", i: "Sen (Koin)" },
             "money": { p: "mani", c: "", i: "uang" }, "cash": { p: "kesy", c: "", i: "tunai" },
@@ -250,7 +245,6 @@
             "indonesian": { p: "indonisyan", c: "", i: "Indonesia" }, "hotel": { p: "hotel", c: "", i: "hotel" },
             "village": { p: "vilej", c: "", i: "desa/kampung" }, "toilet": { p: "toilit", c: "", i: "toilet" },
             "city": { p: "siti", c: "", i: "kota" }, "street": { p: "strit", c: "", i: "jalan" },
-            
             "hello": { p: "helo", c: "", i: "halo" }, "morning": { p: "morning", c: "", i: "pagi" },
             "afternoon": { p: "afternun", c: "", i: "sore" }, "night": { p: "nait", c: "", i: "malam" },
             "friend": { p: "frend", c: "", i: "teman" }, "brother": { p: "brader", c: "", i: "saudara" },
@@ -262,7 +256,6 @@
             "islam": { p: "islam", c: "", i: "Islam" }, "muslim": { p: "muslim", c: "", i: "Muslim" },
             "mosque": { p: "mask", c: "", i: "masjid" }, "religion": { p: "rilijen", c: "", i: "agama" },
             "peace": { p: "pis", c: "", i: "kedamaian" }, "good": { p: "gud", c: "", i: "baik" }, "bad": { p: "bed", c: "", i: "buruk" },
-
             "one": { p: "wan", c: "", i: "satu" }, "two": { p: "tu", c: "", i: "dua" }, 
             "three": { p: "thri", c: "", i: "tiga" }, "four": { p: "for", c: "", i: "empat" }, 
             "five": { p: "faiv", c: "", i: "lima" }, "six": { p: "siks", c: "", i: "enam" }, 
@@ -496,7 +489,7 @@
             document.getElementById('mic-text-id').innerText = "Bicara Indo (ID)";
         }
 
-        // --- SISTEM PEMOTONG KALIMAT OTOMATIS ---
+        // --- SISTEM PEMOTONG KALIMAT DIPERKUAT ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -515,10 +508,12 @@
             }
 
             colorLegend.classList.remove('hidden');
-            const paragraphs = rawText.split('\n').filter(p => p.trim() !== '');
+            
+            // Pemisahan pertama: Berdasarkan enter/baris baru
+            const paragraphs = rawText.split(/\n+/).filter(p => p.trim() !== '');
 
             paragraphs.forEach((para) => {
-                // Memecah paragraf menjadi per kalimat berdasarkan tanda baca . ? !
+                // Pemisahan kedua: Berdasarkan titik, tanda seru, atau tanda tanya
                 const sentences = para.match(/[^.?!]+[.?!]+(?:\s|$)\vert{}[^.?!]+$/g) || [para];
 
                 sentences.forEach((sentence) => {
@@ -526,7 +521,6 @@
                     if(!trimmedSentence) return;
 
                     const block = document.createElement('div');
-                    // Tambahkan garis samar pembatas antar kalimat
                     block.className = "relative group mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"; 
                     
                     const translationMatch = trimmedSentence.match(/<Terjemahan:\s*(.*?)>/);
@@ -570,12 +564,15 @@
 
                     block.innerHTML = `
                         <div class="pr-12">
+                            <!-- LABEL BUKTI UPDATE CACHE -->
+                            <span class="text-xs text-gray-400 font-bold mb-1 block print-hidden">Bagian:</span>
+                            
                             <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
                             <div class="phonetic-input-wrapper">
                                 <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent focus:outline-none outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
                             </div>
                         </div>
-                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200 mt-2">
+                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-4 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
                             <i class="fa-solid fa-volume-high"></i>
                         </button>
                     `;
@@ -602,6 +599,7 @@
             themeIcon.className = htmlElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
 
+        // --- PWA SERVICE WORKER ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
 
