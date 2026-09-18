@@ -170,71 +170,93 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
+        // --- KAMUS MEGA SPIK (VERSI FONETIK REALISTIS / SCHWA / IPA) ---
         const spikDictionary = {
-            "i": { p: "ai", c: "subject" }, "you": { p: "yu", c: "subject" }, "they": { p: "dei", c: "subject" }, 
-            "we": { p: "wi", c: "subject" }, "he": { p: "hi", c: "subject" }, "she": { p: "syi", c: "subject" }, 
-            "it": { p: "it", c: "subject" }, "us": { p: "as", c: "subject" }, "me": { p: "mi", c: "" }, 
-            "him": { p: "him", c: "" }, "them": { p: "dem", c: "" }, "my": { p: "mai", c: "" }, 
-            "your": { p: "yor", c: "" }, "our": { p: "aur", c: "" }, "am": { p: "em", c: "verb" }, 
-            "is": { p: "is", c: "verb" }, "are": { p: "ar", c: "verb" }, "was": { p: "wos", c: "verb" }, 
-            "were": { p: "wer", c: "verb" }, "do": { p: "du", c: "verb" }, "did": { p: "did", c: "verb" },
-            "have": { p: "hev", c: "verb" }, "has": { p: "hes", c: "verb" }, "had": { p: "hed", c: "verb" },
-            "can": { p: "ken", c: "verb" }, "could": { p: "kud", c: "verb" }, "will": { p: "wil", c: "verb" }, 
-            "would": { p: "wud", c: "verb" }, "must": { p: "mast", c: "verb" }, "need": { p: "nid", c: "verb" }, 
-            "should": { p: "syud", c: "verb" }, "what": { p: "wot", c: "" }, "who": { p: "hu", c: "" }, 
-            "where": { p: "wer", c: "" }, "when": { p: "wen", c: "" }, "why": { p: "wai", c: "" }, 
-            "how": { p: "hau", c: "" }, "much": { p: "mac", c: "" }, "many": { p: "meni", c: "" },
-            "in": { p: "in", c: "" }, "on": { p: "on", c: "" }, "at": { p: "et", c: "" }, 
-            "with": { p: "wid", c: "" }, "for": { p: "for", c: "" }, "from": { p: "from", c: "" }, 
-            "to": { p: "tu", c: "" }, "and": { p: "end", c: "" }, "but": { p: "bat", c: "" }, 
-            "because": { p: "bi-kos", c: "" }, "that": { p: "det", c: "" }, "this": { p: "dis", c: "" },
-            "go": { p: "go", c: "verb" }, "want": { p: "won", c: "verb" }, "buy": { p: "bai", c: "verb" }, 
-            "take": { p: "teik", c: "verb" }, "come": { p: "kam", c: "verb" }, "look": { p: "luk", c: "verb" },
+            "i": { p: "ai", c: "subject" }, "you": { p: "yuu", c: "subject" }, "they": { p: "dhei", c: "subject" }, 
+            "we": { p: "wii", c: "subject" }, "he": { p: "hii", c: "subject" }, "she": { p: "shii", c: "subject" }, 
+            "it": { p: "it", c: "subject" }, "us": { p: "əs", c: "subject" }, "me": { p: "mii", c: "" }, 
+            "him": { p: "him", c: "" }, "them": { p: "dhem", c: "" }, "my": { p: "mai", c: "" }, 
+            "your": { p: "yor", c: "" }, "our": { p: "awr", c: "" }, "ourselves": { p: "awr-selvz", c: "" },
+            
+            "am": { p: "em", c: "verb" }, "is": { p: "iz", c: "verb" }, "are": { p: "aar", c: "verb" }, 
+            "was": { p: "wəz", c: "verb" }, "were": { p: "wər", c: "verb" }, "do": { p: "duu", c: "verb" }, 
+            "did": { p: "did", c: "verb" }, "have": { p: "hæv", c: "verb" }, "has": { p: "hæz", c: "verb" }, 
+            "had": { p: "hæd", c: "verb" }, "can": { p: "kæn", c: "verb" }, "could": { p: "kud", c: "verb" }, 
+            "will": { p: "wil", c: "verb" }, "would": { p: "wud", c: "verb" }, "must": { p: "məst", c: "verb" }, 
+            "need": { p: "niid", c: "verb" }, "should": { p: "shud", c: "verb" }, 
+            
+            "what": { p: "wot", c: "" }, "who": { p: "huu", c: "" }, "where": { p: "wer", c: "" }, 
+            "when": { p: "wen", c: "" }, "why": { p: "wai", c: "" }, "how": { p: "haw", c: "" }, 
+            "much": { p: "məch", c: "" }, "many": { p: "me-ni", c: "" },
+            "in": { p: "in", c: "" }, "on": { p: "on", c: "" }, "at": { p: "æt", c: "" }, 
+            "with": { p: "widh", c: "" }, "for": { p: "for", c: "" }, "from": { p: "from", c: "" }, 
+            "to": { p: "tuu", c: "" }, "and": { p: "end", c: "" }, "but": { p: "bət", c: "" }, 
+            "because": { p: "bi-koz", c: "" }, "that": { p: "dhæt", c: "" }, "this": { p: "dhis", c: "" },
+            "all": { p: "ol", c: "" }, "about": { p: "ə-baut", c: "" }, "before": { p: "bi-for", c: "" },
+            
+            "go": { p: "gou", c: "verb" }, "want": { p: "wont", c: "verb" }, "buy": { p: "bai", c: "verb" }, 
+            "take": { p: "teik", c: "verb" }, "come": { p: "kəm", c: "verb" }, "look": { p: "luk", c: "verb" },
             "help": { p: "help", c: "verb" }, "stop": { p: "stop", c: "verb" }, "pay": { p: "pei", c: "verb" }, 
-            "eat": { p: "it", c: "verb" }, "drink": { p: "dringk", c: "verb" }, "sleep": { p: "slip", c: "verb" },
+            "eat": { p: "iit", c: "verb" }, "drink": { p: "dringk", c: "verb" }, "sleep": { p: "sliip", c: "verb" },
             "say": { p: "sei", c: "verb" }, "make": { p: "meik", c: "verb" }, "know": { p: "nou", c: "verb" }, 
-            "see": { p: "si", c: "verb" }, "think": { p: "thingk", c: "verb" }, "give": { p: "giv", c: "verb" },
-            "use": { p: "yus", c: "verb" }, "find": { p: "faind", c: "verb" }, "tell": { p: "tel", c: "verb" }, 
-            "ask": { p: "ask", c: "verb" }, "work": { p: "werk", c: "verb" }, "try": { p: "trai", c: "verb" },
-            "leave": { p: "liv", c: "verb" }, "call": { p: "kol", c: "verb" }, "preach": { p: "pric", c: "verb" }, 
-            "pray": { p: "prei", c: "verb" }, "speak": { p: "spik", c: "verb" }, "listen": { p: "li-sen", c: "verb" },
+            "see": { p: "sii", c: "verb" }, "think": { p: "thingk", c: "verb" }, "give": { p: "giv", c: "verb" },
+            "use": { p: "yuuz", c: "verb" }, "find": { p: "faind", c: "verb" }, "tell": { p: "tel", c: "verb" }, 
+            "ask": { p: "ask", c: "verb" }, "work": { p: "wərk", c: "verb" }, "try": { p: "trai", c: "verb" },
+            "leave": { p: "liiv", c: "verb" }, "call": { p: "kol", c: "verb" }, "preach": { p: "priich", c: "verb" }, 
+            "pray": { p: "prei", c: "verb" }, "speak": { p: "spiik", c: "verb" }, "listen": { p: "li-sən", c: "verb" },
+            "let": { p: "let", c: "verb" }, "act": { p: "ækt", c: "verb" }, "remember": { p: "ri-mem-bər", c: "verb" },
+            "return": { p: "ri-tərn", c: "verb" }, "pleased": { p: "pliizd", c: "verb" }, "decision": { p: "di-si-zhən", c: "" },
+            "day": { p: "dei", c: "" },
+
             "went": { p: "went", c: "verb" }, "wanted": { p: "won-tid", c: "verb" }, "bought": { p: "bot", c: "verb" }, 
             "took": { p: "tuk", c: "verb" }, "came": { p: "keim", c: "verb" }, "looked": { p: "lukt", c: "verb" },
             "helped": { p: "helpt", c: "verb" }, "stopped": { p: "stopt", c: "verb" }, "paid": { p: "peid", c: "verb" }, 
-            "ate": { p: "eit", c: "verb" }, "drank": { p: "drenk", c: "verb" }, "slept": { p: "slept", c: "verb" },
-            "said": { p: "sed", c: "verb" }, "made": { p: "meid", c: "verb" }, "knew": { p: "nyu", c: "verb" }, 
+            "ate": { p: "eit", c: "verb" }, "drank": { p: "drængk", c: "verb" }, "slept": { p: "slept", c: "verb" },
+            "said": { p: "sed", c: "verb" }, "made": { p: "meid", c: "verb" }, "knew": { p: "nyuu", c: "verb" }, 
             "saw": { p: "so", c: "verb" }, "thought": { p: "thot", c: "verb" }, "gave": { p: "geiv", c: "verb" },
-            "found": { p: "faund", c: "verb" }, "told": { p: "told", c: "verb" }, "asked": { p: "askt", c: "verb" }, 
-            "worked": { p: "werkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
-            "called": { p: "kold", c: "verb" }, "preached": { p: "prict", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
-            "spoke": { p: "spouk", c: "verb" }, "papua": { p: "pa-pua", c: "" }, "new": { p: "nyu", c: "" }, 
-            "guinea": { p: "gi-ni", c: "" }, "kina": { p: "ki-na", c: "" }, "toea": { p: "to-ya", c: "" },
-            "money": { p: "ma-ni", c: "" }, "cash": { p: "kesy", c: "" }, "price": { p: "prais", c: "" }, 
-            "cost": { p: "kost", c: "verb" }, "expensive": { p: "eks-pen-siv", c: "" }, "cheap": { p: "cip", c: "" },
-            "pmv": { p: "pi-em-vi", c: "" }, "bus": { p: "bas", c: "" }, "taxi": { p: "tak-si", c: "" }, 
+            "found": { p: "fawnd", c: "verb" }, "told": { p: "told", c: "verb" }, "asked": { p: "askt", c: "verb" }, 
+            "worked": { p: "wərkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
+            "called": { p: "kold", c: "verb" }, "preached": { p: "priicht", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
+            "spoke": { p: "spouk", c: "verb" }, 
+
+            "papua": { p: "pa-pua", c: "" }, "new": { p: "nyuu", c: "" }, "guinea": { p: "gi-ni", c: "" }, 
+            "kina": { p: "ki-na", c: "" }, "toea": { p: "to-ya", c: "" }, "money": { p: "mə-ni", c: "" }, 
+            "cash": { p: "kæsh", c: "" }, "price": { p: "prais", c: "" }, "cost": { p: "kost", c: "verb" }, 
+            "expensive": { p: "eks-pen-siv", c: "" }, "cheap": { p: "chiip", c: "" },
+            "pmv": { p: "pi-em-vi", c: "" }, "bus": { p: "bəs", c: "" }, "taxi": { p: "tæk-si", c: "" }, 
             "fare": { p: "fer", c: "" }, "airport": { p: "er-port", c: "" }, "flight": { p: "flait", c: "" },
-            "boat": { p: "bout", c: "" }, "dinghy": { p: "ding-gi", c: "" }, "ticket": { p: "ti-ket", c: "" }, 
-            "driver": { p: "drai-ver", c: "" }, "port": { p: "port", c: "" }, "moresby": { p: "mors-bi", c: "" },
-            "market": { p: "mar-ket", c: "" }, "hospital": { p: "hos-pi-tal", c: "" }, "police": { p: "po-lis", c: "" }, 
-            "embassy": { p: "em-be-si", c: "" }, "indonesian": { p: "in-do-ni-syan", c: "" }, "hotel": { p: "ho-tel", c: "" },
-            "village": { p: "vi-lej", c: "" }, "toilet": { p: "toi-lit", c: "" }, "city": { p: "si-ti", c: "" }, 
-            "street": { p: "strit", c: "" }, "hello": { p: "he-lo", c: "" }, "morning": { p: "mor-ning", c: "" },
-            "afternoon": { p: "af-ter-nun", c: "" }, "night": { p: "nait", c: "" }, "friend": { p: "frend", c: "" }, 
-            "brother": { p: "bra-der", c: "" }, "danger": { p: "den-jer", c: "" }, "safe": { p: "seif", c: "" },
-            "water": { p: "wo-ter", c: "" }, "food": { p: "fud", c: "" }, "yes": { p: "yes", c: "" }, "no": { p: "nou", c: "" },
-            "please": { p: "plis", c: "" }, "thank": { p: "thengk", c: "verb" }, "god": { p: "god", c: "subject" }, 
-            "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, "muslim": { p: "mus-lim", c: "" },
-            "mosque": { p: "mask", c: "" }, "religion": { p: "ri-li-jen", c: "" }, "peace": { p: "pis", c: "" }, 
-            "good": { p: "gud", c: "" }, "bad": { p: "bed", c: "" }, "one": { p: "wan", c: "" }, "two": { p: "tu", c: "" }, 
-            "three": { p: "thri", c: "" }, "four": { p: "for", c: "" }, "five": { p: "faiv", c: "" }, "six": { p: "siks", c: "" }, 
-            "seven": { p: "se-ven", c: "" }, "eight": { p: "eit", c: "" }, "nine": { p: "nain", c: "" }, "ten": { p: "ten", c: "" },
-            "eleven": { p: "i-le-ven", c: "" }, "twelve": { p: "twelf", c: "" }, "thirteen": { p: "ther-tin", c: "" }, 
-            "fourteen": { p: "for-tin", c: "" }, "fifteen": { p: "fif-tin", c: "" }, "sixteen": { p: "siks-tin", c: "" },
-            "seventeen": { p: "se-ven-tin", c: "" }, "eighteen": { p: "ei-tin", c: "" }, "nineteen": { p: "nain-tin", c: "" }, 
-            "twenty": { p: "twen-ti", c: "" }, "thirty": { p: "ther-ti", c: "" }, "forty": { p: "for-ti", c: "" },
-            "fifty": { p: "fif-ti", c: "" }, "sixty": { p: "siks-ti", c: "" }, "seventy": { p: "se-ven-ti", c: "" }, 
-            "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "han-dred", c: "" },
-            "thousand": { p: "thau-zen", c: "" }, "million": { p: "mil-yen", c: "" }
+            "boat": { p: "bout", c: "" }, "dinghy": { p: "ding-gi", c: "" }, "ticket": { p: "ti-kit", c: "" }, 
+            "driver": { p: "drai-vər", c: "" }, "port": { p: "port", c: "" }, "moresby": { p: "mors-bi", c: "" },
+            "market": { p: "mar-kit", c: "" }, "hospital": { p: "hos-pi-təl", c: "" }, "police": { p: "pə-liis", c: "" }, 
+            "embassy": { p: "em-bə-si", c: "" }, "indonesian": { p: "in-də-nii-zhən", c: "" }, "hotel": { p: "hou-tel", c: "" },
+            "village": { p: "vi-lij", c: "" }, "toilet": { p: "toi-lit", c: "" }, "city": { p: "si-ti", c: "" }, 
+            "street": { p: "striit", c: "" }, 
+            
+            "hello": { p: "he-lou", c: "" }, "morning": { p: "mor-ning", c: "" }, "afternoon": { p: "af-tər-nuun", c: "" }, 
+            "night": { p: "nait", c: "" }, "friend": { p: "frend", c: "" }, "brother": { p: "brə-dhər", c: "" }, 
+            "danger": { p: "dein-jər", c: "" }, "safe": { p: "seif", c: "" }, "water": { p: "wo-tər", c: "" }, 
+            "food": { p: "fuud", c: "" }, "yes": { p: "yes", c: "" }, "no": { p: "nou", c: "" },
+            "please": { p: "pliiz", c: "" }, "thank": { p: "thængk", c: "verb" }, 
+            
+            "god": { p: "god", c: "subject" }, "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, 
+            "muslim": { p: "məz-lim", c: "" }, "mosque": { p: "mosk", c: "" }, "religion": { p: "ri-li-jən", c: "" }, 
+            "peace": { p: "piis", c: "" }, "good": { p: "gud", c: "" }, "bad": { p: "bæd", c: "" }, 
+
+            "taqwa": { p: "taq-wa", c: "" }, "commands": { p: "kə-mandz", c: "" }, "prohibitions": { p: "pro-hi-bi-shənz", c: "" },
+            "steadfast": { p: "sted-fast", c: "" }, "world": { p: "wərld", c: "" }, "hereafter": { p: "hir-af-tər", c: "" },
+            "happiness": { p: "hæp-i-nəs", c: "" }, "eternal": { p: "i-tər-nəl", c: "" }, "ameen": { p: "a-miin", c: "" }, 
+            "amen": { p: "a-miin", c: "" },
+
+            "one": { p: "wən", c: "" }, "two": { p: "tuu", c: "" }, "three": { p: "thrii", c: "" }, 
+            "four": { p: "for", c: "" }, "five": { p: "faiv", c: "" }, "six": { p: "siks", c: "" }, 
+            "seven": { p: "se-vən", c: "" }, "eight": { p: "eit", c: "" }, "nine": { p: "nain", c: "" }, "ten": { p: "ten", c: "" },
+            "eleven": { p: "i-le-vən", c: "" }, "twelve": { p: "twelf", c: "" }, "thirteen": { p: "thər-tiin", c: "" }, 
+            "fourteen": { p: "for-tiin", c: "" }, "fifteen": { p: "fif-tiin", c: "" }, "sixteen": { p: "siks-tiin", c: "" },
+            "seventeen": { p: "se-vən-tiin", c: "" }, "eighteen": { p: "ei-tiin", c: "" }, "nineteen": { p: "nain-tiin", c: "" }, 
+            "twenty": { p: "twen-ti", c: "" }, "thirty": { p: "thər-ti", c: "" }, "forty": { p: "for-ti", c: "" },
+            "fifty": { p: "fif-ti", c: "" }, "sixty": { p: "siks-ti", c: "" }, "seventy": { p: "se-vən-ti", c: "" }, 
+            "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "hən-drəd", c: "" },
+            "thousand": { p: "thau-zənd", c: "" }, "million": { p: "mil-yən", c: "" }
         };
 
         function forceHardReset() {
@@ -374,7 +396,6 @@
             }
         }
 
-        // --- SISTEM TERJEMAHAN API (AMAN) ---
         async function translateAPI(text, sourceLang, targetLang) {
             if (!text || text.trim() === "") return "";
             try {
@@ -466,7 +487,6 @@
             document.getElementById('mic-text-id').innerText = "Bicara (ID)";
         }
 
-        // --- SISTEM PEMROSES CINCANG (MENGATASI TEKS INDO KEPANJANGAN) ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -481,11 +501,8 @@
                 loadingIndicator.classList.remove('hidden'); 
                 colorLegend.classList.remove('hidden');
 
-                // JIKA SAKLAR "KETIK INDO" MENYALA
                 if (isInputIdToEnActive && !skipTranslation) {
                     loadingText.innerText = "Menerjemahkan bahasa Indonesia ke Inggris...";
-                    
-                    // Cincang teks berdasarkan enter agar tidak kena limit URL
                     let paragraphsToTranslate = rawText.split(/\n+/).filter(p => p.trim() !== '');
                     let translatedParts = [];
                     
@@ -493,8 +510,6 @@
                         let res = await translateAPI(p, 'id', 'en');
                         translatedParts.push(res);
                     }
-                    
-                    // Gabungkan kembali teks bahasa Inggrisnya
                     rawText = translatedParts.join('\n\n');
                 }
 
