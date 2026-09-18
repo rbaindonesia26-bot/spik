@@ -28,41 +28,26 @@
         .dark .grammar-active .tag-subject { color: #60a5fa; border-bottom-color: #60a5fa; }
         .dark .grammar-active .tag-verb { color: #f87171; border-bottom-color: #f87171; }
 
-        rt.arti-indo { display: none; }
-        .translate-active rt.arti-indo { display: ruby-text; font-size: 0.75rem; color: #059669; font-family: sans-serif; font-weight: 700; }
-        .dark .translate-active rt.arti-indo { color: #34d399; }
-        .translate-active #document-content { line-height: 2.5; }
-
-        .phonetic-input-wrapper { display: none; }
+        .phonetic-input-wrapper, .translate-wrapper { display: none; }
         .phonetic-active .phonetic-input-wrapper { display: block; }
+        .translate-active .translate-wrapper { display: block; }
         
         .reply-translation { color: #d97706; font-weight: bold; font-size: 0.9em; margin-top: 0.5rem; display: block;}
         .dark .reply-translation { color: #fbbf24; }
 
-        .logo-3d-wrapper {
-            filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.15)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.1));
-            display: inline-block;
-        }
+        .logo-3d-wrapper { filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.15)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.1)); display: inline-block; }
         .dark .logo-3d-wrapper { filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.5)); }
-        .logo-gradient-text {
-            background: linear-gradient(45deg, #0ea5e9, #8b5cf6, #ec4899, #f43f5e);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            color: transparent;
-        }
+        .logo-gradient-text { background: linear-gradient(45deg, #0ea5e9, #8b5cf6, #ec4899, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; }
 
-        /* Penyesuaian agar teks panjang tidak tumpah di HP */
         .text-break-safe { word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
 
         @media print {
             body { background-color: white !important; }
             header, #control-panel, .print-hidden, footer { display: none !important; }
-            #paper-workspace { box-shadow: none !important; margin: 0 !important; padding: 0 !important; max-width: 100% !important; background-color: transparent !important; }
+            #paper-workspace { box-shadow: none !important; margin: 0 !important; padding: 0 !important; max-width: 100% !important; background-color: transparent !important; border: none !important; }
             .phonetic-input { border: none !important; color: #4b5563 !important; }
             .grammar-active .tag-subject { color: #2563eb !important; border-bottom: none !important;}
             .grammar-active .tag-verb { color: #dc2626 !important; border-bottom: none !important;}
-            .translate-active rt.arti-indo { color: #059669 !important; }
         }
     </style>
 </head>
@@ -90,12 +75,12 @@
         <div id="control-panel" class="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
                 <label class="block text-xs sm:text-sm font-semibold dark:text-gray-300">
-                    <i class="fa-solid fa-comments mr-2"></i>Area Percakapan & Naskah:
+                    <i class="fa-solid fa-comments mr-2"></i>Masukan Naskah / Teks AI:
                 </label>
                 
                 <div class="flex items-center gap-2">
                     <input type="file" id="file-upload" class="hidden" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onchange="handleFileUpload(event)">
-                    <button onclick="document.getElementById('file-upload').click()" class="text-xs font-semibold px-2 sm:px-3 py-1.5 rounded bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 text-indigo-700 dark:text-indigo-300 transition flex items-center cursor-pointer shadow-sm border border-indigo-200 dark:border-indigo-700">
+                    <button onclick="document.getElementById('file-upload').click()" class="text-xs font-semibold px-2 sm:px-3 py-1.5 rounded bg-indigo-100 dark:bg-indigo-900/50 hover:bg-indigo-200 text-indigo-700 dark:text-indigo-300 transition flex items-center shadow-sm border border-indigo-200 dark:border-indigo-700">
                         <i class="fa-solid fa-file-arrow-up mr-1"></i> Upload
                     </button>
 
@@ -105,19 +90,19 @@
                 </div>
             </div>
 
-            <textarea id="inputText" rows="4" class="w-full p-3 sm:p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y text-sm sm:text-base" placeholder="Bicara lewat mic, atau paste teks naskah di sini..."></textarea>
+            <textarea id="inputText" rows="4" class="w-full p-3 sm:p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y text-sm sm:text-base" placeholder="Ketik kalimat, paste hasil ChatGPT, atau bicara lewat mic..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
                 <select id="travel-phrases" onchange="insertTravelPhrase()" class="bg-rose-600 text-white px-3 py-2 rounded shadow font-medium text-xs sm:text-sm outline-none cursor-pointer w-full sm:w-auto">
                     <option value="">🆘 Frasa Darurat Offline</option>
-                    <option value="I need help, please. (Saya butuh bantuan.)">Minta Bantuan</option>
-                    <option value="Where is the toilet? (Dimana toilet?)">Tanya Toilet</option>
-                    <option value="How much does this cost? (Berapa harganya?)">Tanya Harga</option>
-                    <option value="Please write the price here. (Tolong ketik harganya di sini.)">Minta Tulis Harga 🔢</option>
-                    <option value="I do not speak English well. (Saya tidak terlalu bisa bahasa Inggris.)">Tidak Bisa Inggris</option>
-                    <option value="Can you take me to the airport? (Bisa antar saya ke bandara?)">Ke Bandara</option>
-                    <option value="Is there a pharmacy nearby? (Apakah ada apotek di dekat sini?)">Cari Apotek</option>
-                    <option value="I want to buy food. (Saya ingin membeli makanan.)">Beli Makanan</option>
+                    <option value="I need help, please.">Minta Bantuan</option>
+                    <option value="Where is the toilet?">Tanya Toilet</option>
+                    <option value="How much does this cost?">Tanya Harga</option>
+                    <option value="Please write the price here.">Minta Tulis Harga 🔢</option>
+                    <option value="I do not speak English well.">Tidak Bisa Inggris</option>
+                    <option value="Can you take me to the airport?">Ke Bandara</option>
+                    <option value="Is there a pharmacy nearby?">Cari Apotek</option>
+                    <option value="I want to buy food.">Beli Makanan</option>
                 </select>
 
                 <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
@@ -131,15 +116,15 @@
 
                 <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
 
-                <button id="btn-input-translate" onclick="toggleInputTranslation()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm" title="Jika ON, teks Indo yang diketik akan jadi Inggris">
+                <button id="btn-input-translate" onclick="toggleInputTranslation()" class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm" title="Ubah Ketikan Indo ke Inggris">
                     <i id="input-translate-icon" class="fa-solid fa-arrow-right-arrow-left mr-1 sm:mr-2"></i> <span id="input-translate-text">Ketik Indo (OFF)</span>
                 </button>
 
                 <button onclick="processText()" class="bg-primary text-white px-4 py-2 rounded shadow hover:bg-blue-600 transition font-medium flex items-center text-xs sm:text-sm">
-                    <i class="fa-solid fa-wand-magic-sparkles mr-1 sm:mr-2"></i> Tampilkan
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1 sm:mr-2"></i> Buat Naskah AI
                 </button>
                 
-                <button onclick="clearText()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-xs sm:text-sm" title="Hapus semua teks">
+                <button onclick="clearText()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-xs sm:text-sm">
                     <i class="fa-solid fa-trash-can mr-1 sm:mr-2"></i> Bersihkan
                 </button>
 
@@ -150,7 +135,7 @@
                         <i id="grammar-icon" class="fa-solid fa-eye mr-1"></i> <span id="grammar-text">Pola (ON)</span>
                     </button>
                     <button id="btn-translate" onclick="toggleTranslate()" class="flex-1 sm:flex-none justify-center bg-teal-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
-                        <i id="translate-icon" class="fa-solid fa-language mr-1"></i> <span id="translate-text">Makna (ON)</span>
+                        <i id="translate-icon" class="fa-solid fa-language mr-1"></i> <span id="translate-text">Arti (ON)</span>
                     </button>
                     <button id="btn-phonetic" onclick="togglePhonetic()" class="flex-1 sm:flex-none justify-center bg-sky-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
                         <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-1"></i> <span id="phonetic-text">Bacaan (ON)</span>
@@ -158,21 +143,20 @@
                 </div>
             </div>
             
-            <div id="loading-indicator" class="hidden mt-3 text-xs sm:text-sm text-blue-600 font-semibold animate-pulse">
-                <i id="loading-icon" class="fa-solid fa-spinner fa-spin mr-2"></i> <span id="loading-text">Menerjemahkan... (Butuh Sinyal Internet)</span>
+            <div id="loading-indicator" class="hidden mt-4 text-xs sm:text-sm text-blue-600 font-bold animate-pulse flex items-center">
+                <i class="fa-solid fa-microchip fa-spin mr-2"></i> Menganalisis naskah secara modern...
             </div>
         </div>
 
         <div class="w-full pb-8">
-            <!-- PADDING DI HP DIPERKECIL (p-4) AGAR TEKS TIDAK SEMPIT -->
-            <div id="paper-workspace" class="grammar-active translate-active phonetic-active bg-white text-gray-900 mx-auto p-4 sm:p-8 md:p-12 shadow-lg rounded-sm w-full max-w-[21cm] border border-gray-300 dark:border-none transition-none relative overflow-hidden">
+            <div id="paper-workspace" class="grammar-active translate-active phonetic-active mx-auto p-4 sm:p-8 md:p-12 w-full max-w-[21cm] transition-none relative overflow-hidden bg-transparent">
                 
-                <div id="color-legend" class="hidden mb-6 bg-blue-50 p-2 sm:p-3 rounded text-xs sm:text-sm print-hidden flex flex-wrap gap-2 sm:gap-4 justify-between items-center border border-blue-100">
-                    <div><strong>Petunjuk:</strong> <span class="text-blue-600 font-bold ml-1">Biru = Subjek</span> | <span class="text-red-600 font-bold">Merah = Kata Kerja</span></div>
-                    <div class="text-emerald-600 font-bold"><i class="fa-solid fa-language"></i> Hijau = Makna</div>
+                <div id="color-legend" class="hidden mb-6 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm text-xs sm:text-sm print-hidden flex flex-wrap gap-2 sm:gap-4 justify-between items-center border border-gray-200 dark:border-gray-700">
+                    <div><strong>Petunjuk Grammar:</strong> <span class="text-blue-600 font-bold ml-1 border-b-2 border-dotted border-blue-600">Biru = Subjek</span> | <span class="text-red-600 font-bold border-b-2 border-dotted border-red-600">Merah = Kata Kerja</span></div>
                 </div>
 
-                <div id="document-content" class="space-y-6 sm:space-y-8 font-serif text-lg sm:text-xl leading-relaxed"></div>
+                <!-- Konten Naskah akan dimuat di sini dalam bentuk Blok Card -->
+                <div id="document-content" class="space-y-6"></div>
             </div>
         </div>
     </main>
@@ -180,110 +164,82 @@
     <footer class="text-center p-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden flex flex-col sm:flex-row justify-center items-center gap-3">
         <span>&copy; 2026 Spik. Travel Edition.</span>
         <button onclick="forceHardReset()" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-full font-bold transition shadow-sm border border-red-200">
-            <i class="fa-solid fa-rotate-right mr-1"></i> Fix Tampilan Nyangkut
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Sistem
         </button>
     </footer>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- KAMUS MEGA SPIK ---
+        // --- KAMUS MEGA SPIK (Telah dioptimasi untuk lidah Indonesia) ---
         const spikDictionary = {
-            "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
-            "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
-            "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
-            "it": { p: "it", c: "subject", i: "itu" }, "us": { p: "as", c: "subject", i: "kita" },
-            "me": { p: "mi", c: "", i: "saya" }, "him": { p: "him", c: "", i: "dia(L)" }, 
-            "them": { p: "dem", c: "", i: "mereka" }, "my": { p: "mai", c: "", i: "milikku" }, 
-            "your": { p: "yor", c: "", i: "milikmu" }, "our": { p: "aur", c: "", i: "milik kami" },
-            "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
-            "was": { p: "wos", c: "verb", i: "adalah(lalu)" }, "were": { p: "wer", c: "verb", i: "adalah(lalu)" },
-            "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
-            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "punya" }, "had": { p: "hed", c: "verb", i: "telah punya" },
-            "can": { p: "ken", c: "verb", i: "bisa" }, "could": { p: "kud", c: "verb", i: "bisa(lalu)" },
-            "will": { p: "wil", c: "verb", i: "akan" }, "would": { p: "wud", c: "verb", i: "akan" },
-            "must": { p: "mast", c: "verb", i: "harus" }, "need": { p: "nid", c: "verb", i: "butuh" }, "should": { p: "syud", c: "verb", i: "seharusnya" },
-            "what": { p: "wot", c: "", i: "apa" }, "who": { p: "hu", c: "", i: "siapa" }, 
-            "where": { p: "wer", c: "", i: "dimana" }, "when": { p: "wen", c: "", i: "kapan" }, 
-            "why": { p: "wai", c: "", i: "kenapa" }, "how": { p: "hau", c: "", i: "bagaimana" }, 
-            "much": { p: "mac", c: "", i: "banyak/harga" }, "many": { p: "meni", c: "", i: "banyak" },
-            "in": { p: "in", c: "", i: "di dalam" }, "on": { p: "on", c: "", i: "di atas" }, 
-            "at": { p: "et", c: "", i: "di" }, "with": { p: "wid", c: "", i: "dengan" }, 
-            "for": { p: "for", c: "", i: "untuk" }, "from": { p: "from", c: "", i: "dari" }, 
-            "to": { p: "tu", c: "", i: "ke/untuk" }, "and": { p: "en", c: "", i: "dan" }, 
-            "but": { p: "bat", c: "", i: "tetapi" }, "because": { p: "bikos", c: "", i: "karena" },
-            "that": { p: "det", c: "", i: "bahwa/itu" }, "this": { p: "dis", c: "", i: "ini" },
-            "go": { p: "go", c: "verb", i: "pergi" }, "want": { p: "won", c: "verb", i: "ingin" },
-            "buy": { p: "bai", c: "verb", i: "beli" }, "take": { p: "teik", c: "verb", i: "mengambil" },
-            "come": { p: "kam", c: "verb", i: "datang" }, "look": { p: "luk", c: "verb", i: "melihat" },
-            "help": { p: "help", c: "verb", i: "tolong" }, "stop": { p: "stop", c: "verb", i: "berhenti" },
-            "pay": { p: "pei", c: "verb", i: "bayar" }, "eat": { p: "it", c: "verb", i: "makan" },
-            "drink": { p: "dringk", c: "verb", i: "minum" }, "sleep": { p: "slip", c: "verb", i: "tidur" },
-            "say": { p: "sei", c: "verb", i: "berkata" }, "make": { p: "meik", c: "verb", i: "membuat" },
-            "know": { p: "nou", c: "verb", i: "tahu" }, "see": { p: "si", c: "verb", i: "melihat" },
-            "think": { p: "thingk", c: "verb", i: "berpikir" }, "give": { p: "giv", c: "verb", i: "memberi" },
-            "use": { p: "yus", c: "verb", i: "pakai" }, "find": { p: "faind", c: "verb", i: "mencari" },
-            "tell": { p: "tel", c: "verb", i: "memberitahu" }, "ask": { p: "ask", c: "verb", i: "bertanya" },
-            "work": { p: "werk", c: "verb", i: "bekerja" }, "try": { p: "trai", c: "verb", i: "mencoba" },
-            "leave": { p: "liv", c: "verb", i: "pergi/sisa" }, "call": { p: "kol", c: "verb", i: "memanggil" },
-            "preach": { p: "pric", c: "verb", i: "berdakwah" }, "pray": { p: "prei", c: "verb", i: "berdoa/shalat" },
-            "speak": { p: "spik", c: "verb", i: "berbicara" }, "listen": { p: "lisen", c: "verb", i: "mendengar" },
-            "went": { p: "went", c: "verb", i: "pergi(lalu)" }, "wanted": { p: "wontid", c: "verb", i: "ingin(lalu)" },
-            "bought": { p: "bot", c: "verb", i: "beli(lalu)" }, "took": { p: "tuk", c: "verb", i: "mengambil(lalu)" },
-            "came": { p: "keim", c: "verb", i: "datang(lalu)" }, "looked": { p: "lukt", c: "verb", i: "melihat(lalu)" },
-            "helped": { p: "helpt", c: "verb", i: "tolong(lalu)" }, "stopped": { p: "stopt", c: "verb", i: "berhenti(lalu)" },
-            "paid": { p: "peid", c: "verb", i: "bayar(lalu)" }, "ate": { p: "eit", c: "verb", i: "makan(lalu)" },
-            "drank": { p: "drenk", c: "verb", i: "minum(lalu)" }, "slept": { p: "slept", c: "verb", i: "tidur(lalu)" },
-            "said": { p: "sed", c: "verb", i: "berkata(lalu)" }, "made": { p: "meid", c: "verb", i: "membuat(lalu)" },
-            "knew": { p: "nyu", c: "verb", i: "tahu(lalu)" }, "saw": { p: "so", c: "verb", i: "melihat(lalu)" },
-            "thought": { p: "thot", c: "verb", i: "berpikir(lalu)" }, "gave": { p: "geiv", c: "verb", i: "memberi(lalu)" },
-            "found": { p: "faund", c: "verb", i: "mencari(lalu)" }, "told": { p: "told", c: "verb", i: "memberitahu(lalu)" },
-            "asked": { p: "askt", c: "verb", i: "bertanya(lalu)" }, "worked": { p: "werkt", c: "verb", i: "bekerja(lalu)" },
-            "tried": { p: "traid", c: "verb", i: "mencoba(lalu)" }, "left": { p: "left", c: "verb", i: "pergi(lalu)" },
-            "called": { p: "kold", c: "verb", i: "memanggil(lalu)" }, "preached": { p: "prict", c: "verb", i: "berdakwah(lalu)" },
-            "prayed": { p: "preid", c: "verb", i: "berdoa(lalu)" }, "spoke": { p: "spouk", c: "verb", i: "berbicara(lalu)" },
-            "papua": { p: "papua", c: "", i: "Papua" }, "new": { p: "nyu", c: "", i: "Baru" }, "guinea": { p: "gini", c: "", i: "Nugini" },
-            "kina": { p: "kina", c: "", i: "Kina (Uang)" }, "toea": { p: "toya", c: "", i: "Sen (Koin)" },
-            "money": { p: "mani", c: "", i: "uang" }, "cash": { p: "kesy", c: "", i: "tunai" },
-            "price": { p: "prais", c: "", i: "harga" }, "cost": { p: "kost", c: "verb", i: "harganya" },
-            "expensive": { p: "ekspensiv", c: "", i: "mahal" }, "cheap": { p: "cip", c: "", i: "murah" },
-            "pmv": { p: "pi-em-vi", c: "", i: "Angkot(PMV)" }, "bus": { p: "bas", c: "", i: "bus" },
-            "taxi": { p: "taksi", c: "", i: "taksi" }, "fare": { p: "fer", c: "", i: "ongkos" },
-            "airport": { p: "erport", c: "", i: "bandara" }, "flight": { p: "flait", c: "", i: "penerbangan" },
-            "boat": { p: "bout", c: "", i: "kapal" }, "dinghy": { p: "dinggi", c: "", i: "perahu motor" },
-            "ticket": { p: "tiket", c: "", i: "tiket" }, "driver": { p: "draiver", c: "", i: "supir" },
-            "port": { p: "port", c: "", i: "pelabuhan" }, "moresby": { p: "morsbi", c: "", i: "Moresby" },
-            "market": { p: "market", c: "", i: "pasar" }, "hospital": { p: "hospitel", c: "", i: "rumah sakit" },
-            "police": { p: "polis", c: "", i: "polisi" }, "embassy": { p: "embesi", c: "", i: "kedutaan" },
-            "indonesian": { p: "indonisyan", c: "", i: "Indonesia" }, "hotel": { p: "hotel", c: "", i: "hotel" },
-            "village": { p: "vilej", c: "", i: "desa/kampung" }, "toilet": { p: "toilit", c: "", i: "toilet" },
-            "city": { p: "siti", c: "", i: "kota" }, "street": { p: "strit", c: "", i: "jalan" },
-            "hello": { p: "helo", c: "", i: "halo" }, "morning": { p: "morning", c: "", i: "pagi" },
-            "afternoon": { p: "afternun", c: "", i: "sore" }, "night": { p: "nait", c: "", i: "malam" },
-            "friend": { p: "frend", c: "", i: "teman" }, "brother": { p: "brader", c: "", i: "saudara" },
-            "danger": { p: "denjer", c: "", i: "bahaya" }, "safe": { p: "seif", c: "", i: "aman" },
-            "water": { p: "woter", c: "", i: "air" }, "food": { p: "fud", c: "", i: "makanan" },
-            "yes": { p: "yes", c: "", i: "ya" }, "no": { p: "nou", c: "", i: "tidak" },
-            "please": { p: "plis", c: "", i: "tolong" }, "thank": { p: "thengk", c: "verb", i: "terima(kasih)" },
-            "god": { p: "god", c: "subject", i: "Tuhan" }, "allah": { p: "allah", c: "subject", i: "Allah" },
-            "islam": { p: "islam", c: "", i: "Islam" }, "muslim": { p: "muslim", c: "", i: "Muslim" },
-            "mosque": { p: "mask", c: "", i: "masjid" }, "religion": { p: "rilijen", c: "", i: "agama" },
-            "peace": { p: "pis", c: "", i: "kedamaian" }, "good": { p: "gud", c: "", i: "baik" }, "bad": { p: "bed", c: "", i: "buruk" },
-            "one": { p: "wan", c: "", i: "satu" }, "two": { p: "tu", c: "", i: "dua" }, 
-            "three": { p: "thri", c: "", i: "tiga" }, "four": { p: "for", c: "", i: "empat" }, 
-            "five": { p: "faiv", c: "", i: "lima" }, "six": { p: "siks", c: "", i: "enam" }, 
-            "seven": { p: "seven", c: "", i: "tujuh" }, "eight": { p: "eit", c: "", i: "delapan" }, 
-            "nine": { p: "nain", c: "", i: "sembilan" }, "ten": { p: "ten", c: "", i: "sepuluh" },
-            "eleven": { p: "ileven", c: "", i: "sebelas" }, "twelve": { p: "twelf", c: "", i: "dua belas" },
-            "thirteen": { p: "thertin", c: "", i: "tiga belas" }, "fourteen": { p: "fortin", c: "", i: "empat belas" },
-            "fifteen": { p: "fiftin", c: "", i: "lima belas" }, "sixteen": { p: "sikstin", c: "", i: "enam belas" },
-            "seventeen": { p: "seventin", c: "", i: "tujuh belas" }, "eighteen": { p: "eitin", c: "", i: "delapan belas" },
-            "nineteen": { p: "naintin", c: "", i: "sembilan belas" }, "twenty": { p: "twenti", c: "", i: "dua puluh" },
-            "thirty": { p: "therti", c: "", i: "tiga puluh" }, "forty": { p: "forti", c: "", i: "empat puluh" },
-            "fifty": { p: "fifti", c: "", i: "lima puluh" }, "sixty": { p: "siksti", c: "", i: "enam puluh" },
-            "seventy": { p: "seventi", c: "", i: "tujuh puluh" }, "eighty": { p: "eiti", c: "", i: "delapan puluh" },
-            "ninety": { p: "nainti", c: "", i: "sembilan puluh" }, "hundred": { p: "handred", c: "", i: "ratus" },
-            "thousand": { p: "thauzen", c: "", i: "ribu" }, "million": { p: "milyen", c: "", i: "juta" }
+            "i": { p: "ai", c: "subject" }, "you": { p: "yu", c: "subject" }, "they": { p: "dei", c: "subject" }, 
+            "we": { p: "wi", c: "subject" }, "he": { p: "hi", c: "subject" }, "she": { p: "syi", c: "subject" }, 
+            "it": { p: "it", c: "subject" }, "us": { p: "as", c: "subject" }, "me": { p: "mi", c: "" }, 
+            "him": { p: "him", c: "" }, "them": { p: "dem", c: "" }, "my": { p: "mai", c: "" }, 
+            "your": { p: "yor", c: "" }, "our": { p: "aur", c: "" }, "am": { p: "em", c: "verb" }, 
+            "is": { p: "is", c: "verb" }, "are": { p: "ar", c: "verb" }, "was": { p: "wos", c: "verb" }, 
+            "were": { p: "wer", c: "verb" }, "do": { p: "du", c: "verb" }, "did": { p: "did", c: "verb" },
+            "have": { p: "hev", c: "verb" }, "has": { p: "hes", c: "verb" }, "had": { p: "hed", c: "verb" },
+            "can": { p: "ken", c: "verb" }, "could": { p: "kud", c: "verb" }, "will": { p: "wil", c: "verb" }, 
+            "would": { p: "wud", c: "verb" }, "must": { p: "mast", c: "verb" }, "need": { p: "nid", c: "verb" }, 
+            "should": { p: "syud", c: "verb" }, "what": { p: "wot", c: "" }, "who": { p: "hu", c: "" }, 
+            "where": { p: "wer", c: "" }, "when": { p: "wen", c: "" }, "why": { p: "wai", c: "" }, 
+            "how": { p: "hau", c: "" }, "much": { p: "mac", c: "" }, "many": { p: "meni", c: "" },
+            "in": { p: "in", c: "" }, "on": { p: "on", c: "" }, "at": { p: "et", c: "" }, 
+            "with": { p: "wid", c: "" }, "for": { p: "for", c: "" }, "from": { p: "from", c: "" }, 
+            "to": { p: "tu", c: "" }, "and": { p: "end", c: "" }, "but": { p: "bat", c: "" }, 
+            "because": { p: "bi-kos", c: "" }, "that": { p: "det", c: "" }, "this": { p: "dis", c: "" },
+            "go": { p: "go", c: "verb" }, "want": { p: "won", c: "verb" }, "buy": { p: "bai", c: "verb" }, 
+            "take": { p: "teik", c: "verb" }, "come": { p: "kam", c: "verb" }, "look": { p: "luk", c: "verb" },
+            "help": { p: "help", c: "verb" }, "stop": { p: "stop", c: "verb" }, "pay": { p: "pei", c: "verb" }, 
+            "eat": { p: "it", c: "verb" }, "drink": { p: "dringk", c: "verb" }, "sleep": { p: "slip", c: "verb" },
+            "say": { p: "sei", c: "verb" }, "make": { p: "meik", c: "verb" }, "know": { p: "nou", c: "verb" }, 
+            "see": { p: "si", c: "verb" }, "think": { p: "thingk", c: "verb" }, "give": { p: "giv", c: "verb" },
+            "use": { p: "yus", c: "verb" }, "find": { p: "faind", c: "verb" }, "tell": { p: "tel", c: "verb" }, 
+            "ask": { p: "ask", c: "verb" }, "work": { p: "werk", c: "verb" }, "try": { p: "trai", c: "verb" },
+            "leave": { p: "liv", c: "verb" }, "call": { p: "kol", c: "verb" }, "preach": { p: "pric", c: "verb" }, 
+            "pray": { p: "prei", c: "verb" }, "speak": { p: "spik", c: "verb" }, "listen": { p: "li-sen", c: "verb" },
+            "went": { p: "went", c: "verb" }, "wanted": { p: "won-tid", c: "verb" }, "bought": { p: "bot", c: "verb" }, 
+            "took": { p: "tuk", c: "verb" }, "came": { p: "keim", c: "verb" }, "looked": { p: "lukt", c: "verb" },
+            "helped": { p: "helpt", c: "verb" }, "stopped": { p: "stopt", c: "verb" }, "paid": { p: "peid", c: "verb" }, 
+            "ate": { p: "eit", c: "verb" }, "drank": { p: "drenk", c: "verb" }, "slept": { p: "slept", c: "verb" },
+            "said": { p: "sed", c: "verb" }, "made": { p: "meid", c: "verb" }, "knew": { p: "nyu", c: "verb" }, 
+            "saw": { p: "so", c: "verb" }, "thought": { p: "thot", c: "verb" }, "gave": { p: "geiv", c: "verb" },
+            "found": { p: "faund", c: "verb" }, "told": { p: "told", c: "verb" }, "asked": { p: "askt", c: "verb" }, 
+            "worked": { p: "werkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
+            "called": { p: "kold", c: "verb" }, "preached": { p: "prict", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
+            "spoke": { p: "spouk", c: "verb" }, "papua": { p: "pa-pua", c: "" }, "new": { p: "nyu", c: "" }, 
+            "guinea": { p: "gi-ni", c: "" }, "kina": { p: "ki-na", c: "" }, "toea": { p: "to-ya", c: "" },
+            "money": { p: "ma-ni", c: "" }, "cash": { p: "kesy", c: "" }, "price": { p: "prais", c: "" }, 
+            "cost": { p: "kost", c: "verb" }, "expensive": { p: "eks-pen-siv", c: "" }, "cheap": { p: "cip", c: "" },
+            "pmv": { p: "pi-em-vi", c: "" }, "bus": { p: "bas", c: "" }, "taxi": { p: "tak-si", c: "" }, 
+            "fare": { p: "fer", c: "" }, "airport": { p: "er-port", c: "" }, "flight": { p: "flait", c: "" },
+            "boat": { p: "bout", c: "" }, "dinghy": { p: "ding-gi", c: "" }, "ticket": { p: "ti-ket", c: "" }, 
+            "driver": { p: "drai-ver", c: "" }, "port": { p: "port", c: "" }, "moresby": { p: "mors-bi", c: "" },
+            "market": { p: "mar-ket", c: "" }, "hospital": { p: "hos-pi-tal", c: "" }, "police": { p: "po-lis", c: "" }, 
+            "embassy": { p: "em-be-si", c: "" }, "indonesian": { p: "in-do-ni-syan", c: "" }, "hotel": { p: "ho-tel", c: "" },
+            "village": { p: "vi-lej", c: "" }, "toilet": { p: "toi-lit", c: "" }, "city": { p: "si-ti", c: "" }, 
+            "street": { p: "strit", c: "" }, "hello": { p: "he-lo", c: "" }, "morning": { p: "mor-ning", c: "" },
+            "afternoon": { p: "af-ter-nun", c: "" }, "night": { p: "nait", c: "" }, "friend": { p: "frend", c: "" }, 
+            "brother": { p: "bra-der", c: "" }, "danger": { p: "den-jer", c: "" }, "safe": { p: "seif", c: "" },
+            "water": { p: "wo-ter", c: "" }, "food": { p: "fud", c: "" }, "yes": { p: "yes", c: "" }, "no": { p: "nou", c: "" },
+            "please": { p: "plis", c: "" }, "thank": { p: "thengk", c: "verb" }, "god": { p: "god", c: "subject" }, 
+            "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, "muslim": { p: "mus-lim", c: "" },
+            "mosque": { p: "mask", c: "" }, "religion": { p: "ri-li-jen", c: "" }, "peace": { p: "pis", c: "" }, 
+            "good": { p: "gud", c: "" }, "bad": { p: "bed", c: "" }, "one": { p: "wan", c: "" }, "two": { p: "tu", c: "" }, 
+            "three": { p: "thri", c: "" }, "four": { p: "for", c: "" }, "five": { p: "faiv", c: "" }, "six": { p: "siks", c: "" }, 
+            "seven": { p: "se-ven", c: "" }, "eight": { p: "eit", c: "" }, "nine": { p: "nain", c: "" }, "ten": { p: "ten", c: "" },
+            "eleven": { p: "i-le-ven", c: "" }, "twelve": { p: "twelf", c: "" }, "thirteen": { p: "ther-tin", c: "" }, 
+            "fourteen": { p: "for-tin", c: "" }, "fifteen": { p: "fif-tin", c: "" }, "sixteen": { p: "siks-tin", c: "" },
+            "seventeen": { p: "se-ven-tin", c: "" }, "eighteen": { p: "ei-tin", c: "" }, "nineteen": { p: "nain-tin", c: "" }, 
+            "twenty": { p: "twen-ti", c: "" }, "thirty": { p: "ther-ti", c: "" }, "forty": { p: "for-ti", c: "" },
+            "fifty": { p: "fif-ti", c: "" }, "sixty": { p: "siks-ti", c: "" }, "seventy": { p: "se-ven-ti", c: "" }, 
+            "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "han-dred", c: "" },
+            "thousand": { p: "thau-zen", c: "" }, "million": { p: "mil-yen", c: "" },
+            "taqwa": { p: "tak-wa", c: "" }, "commands": { p: "ko-mands", c: "" }, "prohibitions": { p: "pro-hi-bi-syens", c: "" },
+            "steadfast": { p: "sted-fast", c: "" }, "world": { p: "werld", c: "" }, "hereafter": { p: "hir-af-ter", c: "" },
+            "happiness": { p: "he-pi-nes", c: "" }, "eternal": { p: "i-ter-nal", c: "" }, "ameen": { p: "a-min", c: "" }, "amen": { p: "a-min", c: "" }
         };
 
         function forceHardReset() {
@@ -385,11 +341,11 @@
             const btn = document.getElementById('btn-translate');
             if (isTranslateActive) {
                 workspace.classList.add('translate-active');
-                document.getElementById('translate-text').innerText = "Makna (ON)";
+                document.getElementById('translate-text').innerText = "Arti (ON)";
                 btn.classList.replace('bg-gray-500', 'bg-teal-600');
             } else {
                 workspace.classList.remove('translate-active');
-                document.getElementById('translate-text').innerText = "Makna (OFF)";
+                document.getElementById('translate-text').innerText = "Arti (OFF)";
                 btn.classList.replace('bg-teal-600', 'bg-gray-500');
             }
         }
@@ -431,7 +387,7 @@
                 let translatedResult = '';
                 data[0].forEach(item => { if(item[0]) translatedResult += item[0]; });
                 return translatedResult;
-            } catch (error) { return text; }
+            } catch (error) { return ""; }
         }
 
         let recognition = null;
@@ -463,7 +419,7 @@
                     loadingIndicator.classList.remove('hidden');
                     document.getElementById('loading-text').innerText = "Menerjemahkan ucapan Bule ke bahasa Indonesia...";
                     const artiIndo = await translateAPI(currentSpeech, 'en', 'id');
-                    if(artiIndo !== currentSpeech) {
+                    if(artiIndo !== currentSpeech && artiIndo !== "") {
                         currentSpeech = currentSpeech + "\n<Terjemahan: " + artiIndo + ">";
                     }
                     loadingIndicator.classList.add('hidden');
@@ -515,7 +471,7 @@
             document.getElementById('mic-text-id').innerText = "Bicara (ID)";
         }
 
-        // --- SISTEM PEMOTONG SUPER (Titik, Koma, Tanya, Seru) ---
+        // --- SISTEM LAYOUT BLOK AI MODERN ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -525,35 +481,35 @@
             docContent.innerHTML = '';
             if(!rawText.trim()) { colorLegend.classList.add('hidden'); return; }
 
+            loadingIndicator.classList.remove('hidden');
+            colorLegend.classList.remove('hidden');
+
             if (isInputIdToEnActive && !skipTranslation) {
-                loadingIndicator.classList.remove('hidden');
-                document.getElementById('loading-text').innerText = "Menerjemahkan teks...";
+                document.getElementById('loading-text').innerText = "Menerjemahkan input ke Inggris...";
                 const translated = await translateAPI(rawText, 'id', 'en');
                 if (translated) rawText = translated;
-                loadingIndicator.classList.add('hidden');
             }
 
-            colorLegend.classList.remove('hidden');
-            
             const paragraphs = rawText.split(/\n+/).filter(p => p.trim() !== '');
             let partCounter = 1;
 
-            paragraphs.forEach((para) => {
-                // Memecah berdasarkan TITIK (.), KOMA (,), TANDA TANYA (?), TANDA SERU (!), atau TITIK KOMA (;)
+            // Proses setiap kalimat dengan susunan 3 Blok
+            for (const para of paragraphs) {
                 const sentences = para.match(/[^.,?!;]+[.,?!;]+(?:\s|$)\vert{}[^.,?!;]+$/g) || [para];
 
-                sentences.forEach((sentence) => {
+                for (const sentence of sentences) {
                     const trimmedSentence = sentence.trim();
-                    if(!trimmedSentence) return;
+                    if(!trimmedSentence) continue;
 
                     const block = document.createElement('div');
-                    block.className = "relative group mb-4 border-b border-gray-200 dark:border-gray-700 pb-3"; 
+                    // Menggunakan gaya "Card" ala ChatGPT yang mewah
+                    block.className = "relative group bg-white dark:bg-gray-800 rounded-xl p-5 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700 break-words mb-6"; 
                     
                     const translationMatch = trimmedSentence.match(/<Terjemahan:\s*(.*?)>/);
                     if(translationMatch) {
-                        block.innerHTML = `<p class="reply-translation"><i class="fa-solid fa-language mr-1"></i> Orang itu bilang: "${translationMatch[1]}"</p>`;
+                        block.innerHTML = `<div class="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg border-l-4 border-amber-500"><p class="text-amber-800 dark:text-amber-300 font-bold"><i class="fa-solid fa-language mr-2"></i>Orang itu bilang: "${translationMatch[1]}"</p></div>`;
                         docContent.appendChild(block);
-                        return; 
+                        continue; 
                     }
 
                     const safeTextToSpeak = trimmedSentence.replace(/'/g, "\\'");
@@ -575,9 +531,6 @@
                             if (dictionaryEntry.c === "subject") formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
                             else if (dictionaryEntry.c === "verb") formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
                             
-                            if (dictionaryEntry.i && dictionaryEntry.i !== "") {
-                                formattedWord = `<ruby>${formattedWord}<rt class="arti-indo">${dictionaryEntry.i}</rt></ruby>`;
-                            }
                             displayHTMLWords.push(formattedWord + punctuation);
                         } else {
                             phoneticWords.push(cleanWord + punctuation);
@@ -588,23 +541,46 @@
                     const finalDisplayHTML = displayHTMLWords.join(" ");
                     const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
 
+                    // Ambil arti kalimat lengkap via Internet
+                    document.getElementById('loading-text').innerText = `Menerjemahkan Bagian ${partCounter}...`;
+                    let artiKalimatLengkap = "";
+                    if(navigator.onLine) {
+                        artiKalimatLengkap = await translateAPI(trimmedSentence, 'en', 'id');
+                    } else {
+                        artiKalimatLengkap = "📶 Mode Darurat Offline: Arti kalimat utuh tidak tersedia tanpa sinyal.";
+                    }
+
+                    // Susunan 3 Lapis (Inggris -> Cara Baca -> Arti)
                     block.innerHTML = `
-                        <!-- Ruang di kanan (pr-10) untuk menghindari tombol speaker menutupi teks di HP -->
-                        <div class="pr-10 sm:pr-12 text-break-safe">
-                            <span class="text-[10px] sm:text-xs text-blue-500 font-bold mb-1 block print-hidden"><i class="fa-solid fa-list-ol mr-1"></i> Potongan ${partCounter}</span>
-                            <p class="text-lg sm:text-xl mb-2 text-justify text-gray-900">${finalDisplayHTML}</p>
-                            <div class="phonetic-input-wrapper">
-                                <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-base sm:text-lg bg-transparent focus:outline-none outline-none pb-1 text-break-safe leading-relaxed">${finalPhoneticText}</div>
+                        <div class="pr-12 text-break-safe space-y-4">
+                            <!-- Blok Teks Inggris -->
+                            <div>
+                                <p class="text-xl sm:text-2xl font-serif text-gray-900 dark:text-gray-100 leading-relaxed">${finalDisplayHTML}</p>
+                            </div>
+
+                            <!-- Blok Cara Baca -->
+                            <div class="phonetic-input-wrapper bg-blue-50 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-500 mt-2">
+                                <span class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-comment-dots mr-1"></i>Cara Baca</span>
+                                <div contenteditable="true" class="phonetic-input w-full text-blue-700 dark:text-blue-300 font-mono text-base sm:text-lg bg-transparent focus:outline-none outline-none text-break-safe leading-relaxed">${finalPhoneticText}</div>
+                            </div>
+                            
+                            <!-- Blok Arti -->
+                            <div class="translate-wrapper bg-green-50 dark:bg-green-900/20 p-3 rounded border-l-4 border-green-500 mt-2">
+                                <span class="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-language mr-1"></i>Arti Kalimat</span>
+                                <p class="text-base sm:text-lg text-green-800 dark:text-green-300 leading-relaxed">${artiKalimatLengkap}</p>
                             </div>
                         </div>
-                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-2 right-0 w-8 h-8 sm:w-10 sm:h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200">
-                            <i class="fa-solid fa-volume-high text-xs sm:text-base"></i>
+
+                        <!-- Tombol Speaker -->
+                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-4 right-4 w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 transition shadow-sm border border-gray-200 dark:border-gray-600">
+                            <i class="fa-solid fa-volume-high text-sm sm:text-base"></i>
                         </button>
                     `;
                     docContent.appendChild(block);
                     partCounter++;
-                });
-            });
+                }
+            }
+            loadingIndicator.classList.add('hidden');
         }
 
         function playAudio(text) {
@@ -625,35 +601,24 @@
             themeIcon.className = htmlElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
 
-        // --- PWA SERVICE WORKER ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
 
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').then(reg => {
-                    reg.update(); 
-                }).catch(err => console.log('PWA Service Worker tidak terdaftar.'));
+                navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); }).catch(err => console.log('PWA Error.'));
             });
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            installBtn.classList.remove('hidden');
+            e.preventDefault(); deferredPrompt = e; installBtn.classList.remove('hidden');
         });
 
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                installBtn.classList.add('hidden');
+                deferredPrompt.prompt(); await deferredPrompt.userChoice;
+                deferredPrompt = null; installBtn.classList.add('hidden');
             }
-        });
-
-        window.addEventListener('appinstalled', () => {
-            installBtn.classList.add('hidden');
         });
     </script>
 </body>
