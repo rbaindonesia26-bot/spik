@@ -144,7 +144,7 @@
             </div>
             
             <div id="loading-indicator" class="hidden mt-4 text-xs sm:text-sm text-blue-600 font-bold flex items-center">
-                <i class="fa-solid fa-microchip fa-spin mr-2"></i> Mempersiapkan area kerja...
+                <i class="fa-solid fa-microchip fa-spin mr-2"></i> <span id="loading-text">Mempersiapkan area kerja...</span>
             </div>
         </div>
 
@@ -170,7 +170,6 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- KAMUS MEGA SPIK ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject" }, "you": { p: "yu", c: "subject" }, "they": { p: "dei", c: "subject" }, 
             "we": { p: "wi", c: "subject" }, "he": { p: "hi", c: "subject" }, "she": { p: "syi", c: "subject" }, 
@@ -375,7 +374,7 @@
             }
         }
 
-        // --- SISTEM TERJEMAHAN ANTI NYANGKUT (METODE GET AMAN) ---
+        // --- SISTEM TERJEMAHAN API (AMAN) ---
         async function translateAPI(text, sourceLang, targetLang) {
             if (!text || text.trim() === "") return "";
             try {
@@ -467,33 +466,44 @@
             document.getElementById('mic-text-id').innerText = "Bicara (ID)";
         }
 
-        // --- SISTEM TERJEMAHAN MENYUSUL (LAZY LOADING) ---
+        // --- SISTEM PEMROSES CINCANG (MENGATASI TEKS INDO KEPANJANGAN) ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
             const colorLegend = document.getElementById('color-legend');
             const loadingIndicator = document.getElementById('loading-indicator');
+            const loadingText = document.getElementById('loading-text');
             
             docContent.innerHTML = '';
             if(!rawText.trim()) { colorLegend.classList.add('hidden'); return; }
 
             try {
-                // Jangan blokir layar! Hilangkan logo loading dan langsung munculkan teks Inggrisnya.
-                loadingIndicator.classList.add('hidden'); 
+                loadingIndicator.classList.remove('hidden'); 
                 colorLegend.classList.remove('hidden');
 
+                // JIKA SAKLAR "KETIK INDO" MENYALA
                 if (isInputIdToEnActive && !skipTranslation) {
-                    loadingIndicator.classList.remove('hidden');
-                    const translated = await translateAPI(rawText, 'id', 'en');
-                    if (translated) rawText = translated;
-                    loadingIndicator.classList.add('hidden');
+                    loadingText.innerText = "Menerjemahkan bahasa Indonesia ke Inggris...";
+                    
+                    // Cincang teks berdasarkan enter agar tidak kena limit URL
+                    let paragraphsToTranslate = rawText.split(/\n+/).filter(p => p.trim() !== '');
+                    let translatedParts = [];
+                    
+                    for (let p of paragraphsToTranslate) {
+                        let res = await translateAPI(p, 'id', 'en');
+                        translatedParts.push(res);
+                    }
+                    
+                    // Gabungkan kembali teks bahasa Inggrisnya
+                    rawText = translatedParts.join('\n\n');
                 }
+
+                loadingIndicator.classList.add('hidden');
 
                 const paragraphs = rawText.split(/\n+/).filter(p => p.trim() !== '');
                 let partCounter = 1;
 
                 for (const para of paragraphs) {
-                    // Pecah berdasarkan titik, tanda tanya, atau seru
                     const sentences = para.match(/[^.?!;]+[.?!;]+(?:\s|$)\vert{}[^.?!;]+$/g) || [para];
 
                     for (const sentence of sentences) {
@@ -538,8 +548,6 @@
 
                         const finalDisplayHTML = displayHTMLWords.join(" ");
                         const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
-                        
-                        // Buat ID unik untuk kotak Terjemahan
                         const transId = 'trans-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
                         block.innerHTML = `
@@ -567,7 +575,6 @@
                         docContent.appendChild(block);
                         partCounter++;
 
-                        // --- TERJEMAHAN LAZY LOAD DI LATAR BELAKANG ---
                         if (navigator.onLine) {
                             translateAPI(trimmedSentence, 'en', 'id').then(res => {
                                 const el = document.getElementById(transId);
@@ -582,7 +589,6 @@
             } catch (err) {
                 console.error("Proses teks macet:", err);
             } finally {
-                // Apapun yang terjadi (sukses/gagal), pastikan loading berhenti!
                 loadingIndicator.classList.add('hidden');
             }
         }
