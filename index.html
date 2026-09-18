@@ -21,6 +21,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+    <!-- TAMBAHAN: Pustaka Cetak PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         .grammar-active .tag-subject { color: #2563eb; font-weight: 700; border-bottom: 2px dotted #2563eb; transition: all 0.2s; }
@@ -40,6 +42,14 @@
         .logo-gradient-text { background: linear-gradient(45deg, #0ea5e9, #8b5cf6, #ec4899, #f43f5e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; color: transparent; }
 
         .text-break-safe { word-wrap: break-word; overflow-wrap: break-word; word-break: break-word; }
+
+        /* PENGATURAN TAMPILAN SAAT CETAK PDF */
+        .exporting-pdf .print-hidden { display: none !important; }
+        .exporting-pdf #paper-workspace { padding: 20px !important; box-shadow: none !important; border: none !important; max-width: 100% !important; background-color: white !important; }
+        .exporting-pdf .phonetic-input { border-bottom: none !important; color: #1d4ed8 !important; } /* Warna biru tegas tanpa garis putus */
+        .exporting-pdf .text-gray-900 { color: #000 !important; }
+        .exporting-pdf .translate-wrapper { background-color: #f0fdf4 !important; border-left-color: #22c55e !important; }
+        .exporting-pdf .phonetic-input-wrapper { background-color: #eff6ff !important; border-left-color: #3b82f6 !important; }
 
         @media print {
             body { background-color: white !important; }
@@ -130,7 +140,7 @@
 
                 <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
                 
-                <div class="flex gap-2 print-hidden w-full sm:w-auto mt-2 sm:mt-0">
+                <div class="flex flex-wrap gap-2 print-hidden w-full sm:w-auto mt-2 sm:mt-0 items-center">
                     <button id="btn-grammar" onclick="toggleGrammar()" class="flex-1 sm:flex-none justify-center bg-purple-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
                         <i id="grammar-icon" class="fa-solid fa-eye mr-1"></i> <span id="grammar-text">Pola (ON)</span>
                     </button>
@@ -139,6 +149,12 @@
                     </button>
                     <button id="btn-phonetic" onclick="togglePhonetic()" class="flex-1 sm:flex-none justify-center bg-sky-600 text-white px-2 py-2 rounded shadow transition font-medium flex items-center text-xs">
                         <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-1"></i> <span id="phonetic-text">Bacaan (ON)</span>
+                    </button>
+
+                    <!-- TOMBOL UNDUH PDF BARU -->
+                    <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1 hidden sm:block"></div>
+                    <button onclick="downloadPDF()" class="flex-1 sm:flex-none justify-center bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
+                        <i class="fa-solid fa-file-pdf mr-1 sm:mr-2"></i> Unduh PDF
                     </button>
                 </div>
             </div>
@@ -170,21 +186,18 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- KAMUS MEGA SPIK (VERSI FONETIK REALISTIS / SCHWA / IPA) ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject" }, "you": { p: "yuu", c: "subject" }, "they": { p: "dhei", c: "subject" }, 
             "we": { p: "wii", c: "subject" }, "he": { p: "hii", c: "subject" }, "she": { p: "shii", c: "subject" }, 
             "it": { p: "it", c: "subject" }, "us": { p: "əs", c: "subject" }, "me": { p: "mii", c: "" }, 
             "him": { p: "him", c: "" }, "them": { p: "dhem", c: "" }, "my": { p: "mai", c: "" }, 
             "your": { p: "yor", c: "" }, "our": { p: "awr", c: "" }, "ourselves": { p: "awr-selvz", c: "" },
-            
             "am": { p: "em", c: "verb" }, "is": { p: "iz", c: "verb" }, "are": { p: "aar", c: "verb" }, 
             "was": { p: "wəz", c: "verb" }, "were": { p: "wər", c: "verb" }, "do": { p: "duu", c: "verb" }, 
             "did": { p: "did", c: "verb" }, "have": { p: "hæv", c: "verb" }, "has": { p: "hæz", c: "verb" }, 
             "had": { p: "hæd", c: "verb" }, "can": { p: "kæn", c: "verb" }, "could": { p: "kud", c: "verb" }, 
             "will": { p: "wil", c: "verb" }, "would": { p: "wud", c: "verb" }, "must": { p: "məst", c: "verb" }, 
             "need": { p: "niid", c: "verb" }, "should": { p: "shud", c: "verb" }, 
-            
             "what": { p: "wot", c: "" }, "who": { p: "huu", c: "" }, "where": { p: "wer", c: "" }, 
             "when": { p: "wen", c: "" }, "why": { p: "wai", c: "" }, "how": { p: "haw", c: "" }, 
             "much": { p: "məch", c: "" }, "many": { p: "me-ni", c: "" },
@@ -193,7 +206,6 @@
             "to": { p: "tuu", c: "" }, "and": { p: "end", c: "" }, "but": { p: "bət", c: "" }, 
             "because": { p: "bi-koz", c: "" }, "that": { p: "dhæt", c: "" }, "this": { p: "dhis", c: "" },
             "all": { p: "ol", c: "" }, "about": { p: "ə-baut", c: "" }, "before": { p: "bi-for", c: "" },
-            
             "go": { p: "gou", c: "verb" }, "want": { p: "wont", c: "verb" }, "buy": { p: "bai", c: "verb" }, 
             "take": { p: "teik", c: "verb" }, "come": { p: "kəm", c: "verb" }, "look": { p: "luk", c: "verb" },
             "help": { p: "help", c: "verb" }, "stop": { p: "stop", c: "verb" }, "pay": { p: "pei", c: "verb" }, 
@@ -207,7 +219,6 @@
             "let": { p: "let", c: "verb" }, "act": { p: "ækt", c: "verb" }, "remember": { p: "ri-mem-bər", c: "verb" },
             "return": { p: "ri-tərn", c: "verb" }, "pleased": { p: "pliizd", c: "verb" }, "decision": { p: "di-si-zhən", c: "" },
             "day": { p: "dei", c: "" },
-
             "went": { p: "went", c: "verb" }, "wanted": { p: "won-tid", c: "verb" }, "bought": { p: "bot", c: "verb" }, 
             "took": { p: "tuk", c: "verb" }, "came": { p: "keim", c: "verb" }, "looked": { p: "lukt", c: "verb" },
             "helped": { p: "helpt", c: "verb" }, "stopped": { p: "stopt", c: "verb" }, "paid": { p: "peid", c: "verb" }, 
@@ -218,7 +229,6 @@
             "worked": { p: "wərkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
             "called": { p: "kold", c: "verb" }, "preached": { p: "priicht", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
             "spoke": { p: "spouk", c: "verb" }, 
-
             "papua": { p: "pa-pua", c: "" }, "new": { p: "nyuu", c: "" }, "guinea": { p: "gi-ni", c: "" }, 
             "kina": { p: "ki-na", c: "" }, "toea": { p: "to-ya", c: "" }, "money": { p: "mə-ni", c: "" }, 
             "cash": { p: "kæsh", c: "" }, "price": { p: "prais", c: "" }, "cost": { p: "kost", c: "verb" }, 
@@ -231,22 +241,18 @@
             "embassy": { p: "em-bə-si", c: "" }, "indonesian": { p: "in-də-nii-zhən", c: "" }, "hotel": { p: "hou-tel", c: "" },
             "village": { p: "vi-lij", c: "" }, "toilet": { p: "toi-lit", c: "" }, "city": { p: "si-ti", c: "" }, 
             "street": { p: "striit", c: "" }, 
-            
             "hello": { p: "he-lou", c: "" }, "morning": { p: "mor-ning", c: "" }, "afternoon": { p: "af-tər-nuun", c: "" }, 
             "night": { p: "nait", c: "" }, "friend": { p: "frend", c: "" }, "brother": { p: "brə-dhər", c: "" }, 
             "danger": { p: "dein-jər", c: "" }, "safe": { p: "seif", c: "" }, "water": { p: "wo-tər", c: "" }, 
             "food": { p: "fuud", c: "" }, "yes": { p: "yes", c: "" }, "no": { p: "nou", c: "" },
             "please": { p: "pliiz", c: "" }, "thank": { p: "thængk", c: "verb" }, 
-            
             "god": { p: "god", c: "subject" }, "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, 
             "muslim": { p: "məz-lim", c: "" }, "mosque": { p: "mosk", c: "" }, "religion": { p: "ri-li-jən", c: "" }, 
             "peace": { p: "piis", c: "" }, "good": { p: "gud", c: "" }, "bad": { p: "bæd", c: "" }, 
-
             "taqwa": { p: "taq-wa", c: "" }, "commands": { p: "kə-mandz", c: "" }, "prohibitions": { p: "pro-hi-bi-shənz", c: "" },
             "steadfast": { p: "sted-fast", c: "" }, "world": { p: "wərld", c: "" }, "hereafter": { p: "hir-af-tər", c: "" },
             "happiness": { p: "hæp-i-nəs", c: "" }, "eternal": { p: "i-tər-nəl", c: "" }, "ameen": { p: "a-miin", c: "" }, 
             "amen": { p: "a-miin", c: "" },
-
             "one": { p: "wən", c: "" }, "two": { p: "tuu", c: "" }, "three": { p: "thrii", c: "" }, 
             "four": { p: "for", c: "" }, "five": { p: "faiv", c: "" }, "six": { p: "siks", c: "" }, 
             "seven": { p: "se-vən", c: "" }, "eight": { p: "eit", c: "" }, "nine": { p: "nain", c: "" }, "ten": { p: "ten", c: "" },
@@ -258,6 +264,30 @@
             "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "hən-drəd", c: "" },
             "thousand": { p: "thau-zənd", c: "" }, "million": { p: "mil-yən", c: "" }
         };
+
+        // --- FUNGSI UNDUH PDF ---
+        function downloadPDF() {
+            const element = document.getElementById('paper-workspace');
+            
+            // Konfigurasi PDF F4 Landscape
+            const opt = {
+                margin:       10,
+                filename:     'Spik_Travel_Naskah.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, useCORS: true },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Tambahkan class penanda agar CSS PDF jalan
+            document.body.classList.add('exporting-pdf');
+            
+            // Jeda 100ms agar CSS diaplikasikan sebelum direkam
+            setTimeout(() => {
+                html2pdf().set(opt).from(element).save().then(() => {
+                    document.body.classList.remove('exporting-pdf');
+                });
+            }, 100);
+        }
 
         function forceHardReset() {
             if ('serviceWorker' in navigator) {
@@ -573,13 +603,13 @@
                                 </div>
 
                                 <div class="phonetic-input-wrapper bg-blue-50 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-500 mt-2">
-                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-comment-dots mr-1"></i>Cara Baca</span>
+                                    <span class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1 block print-hidden"><i class="fa-solid fa-comment-dots mr-1"></i>Cara Baca</span>
                                     <div contenteditable="true" class="phonetic-input w-full text-blue-700 dark:text-blue-300 font-mono text-base sm:text-lg bg-transparent focus:outline-none outline-none text-break-safe leading-relaxed">${finalPhoneticText}</div>
                                 </div>
                                 
                                 <div class="translate-wrapper bg-green-50 dark:bg-green-900/20 p-3 rounded border-l-4 border-green-500 mt-2">
-                                    <span class="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-language mr-1"></i>Arti Kalimat</span>
-                                    <p id="${transId}" class="text-base sm:text-lg text-green-800 dark:text-green-300 leading-relaxed"><i class="fa-solid fa-spinner fa-spin mr-1"></i> Menyusun arti...</p>
+                                    <span class="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider mb-1 block print-hidden"><i class="fa-solid fa-language mr-1"></i>Arti Kalimat</span>
+                                    <p id="${transId}" class="text-base sm:text-lg text-green-800 dark:text-green-300 leading-relaxed"><i class="fa-solid fa-spinner fa-spin mr-1 print-hidden"></i> Menyusun arti...</p>
                                 </div>
                             </div>
 
