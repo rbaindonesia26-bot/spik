@@ -174,7 +174,7 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- KAMUS MEGA SPIK (Kosakata Inti, Past Tense, Travel, Dakwah & ANGKA) ---
+        // --- KAMUS MEGA SPIK ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
@@ -263,7 +263,6 @@
             "mosque": { p: "mask", c: "", i: "masjid" }, "religion": { p: "rilijen", c: "", i: "agama" },
             "peace": { p: "pis", c: "", i: "kedamaian" }, "good": { p: "gud", c: "", i: "baik" }, "bad": { p: "bed", c: "", i: "buruk" },
 
-            // --- TAMBAHAN ANGKA (NUMBERS) ---
             "one": { p: "wan", c: "", i: "satu" }, "two": { p: "tu", c: "", i: "dua" }, 
             "three": { p: "thri", c: "", i: "tiga" }, "four": { p: "for", c: "", i: "empat" }, 
             "five": { p: "faiv", c: "", i: "lima" }, "six": { p: "siks", c: "", i: "enam" }, 
@@ -290,7 +289,6 @@
             }
         }
 
-        // FUNGSI BERSIHKAN TEKS
         function clearText() {
             document.getElementById('inputText').value = '';
             document.getElementById('document-content').innerHTML = '';
@@ -498,6 +496,7 @@
             document.getElementById('mic-text-id').innerText = "Bicara Indo (ID)";
         }
 
+        // --- SISTEM PEMOTONG KALIMAT OTOMATIS ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -519,60 +518,69 @@
             const paragraphs = rawText.split('\n').filter(p => p.trim() !== '');
 
             paragraphs.forEach((para) => {
-                const block = document.createElement('div');
-                block.className = "relative group mb-6";
-                
-                const translationMatch = para.match(/<Terjemahan:\s*(.*?)>/);
-                if(translationMatch) {
-                    block.innerHTML = `<p class="reply-translation"><i class="fa-solid fa-language mr-1"></i> Orang itu bilang: "${translationMatch[1]}"</p>`;
-                    docContent.appendChild(block);
-                    return; 
-                }
+                // Memecah paragraf menjadi per kalimat berdasarkan tanda baca . ? !
+                const sentences = para.match(/[^.?!]+[.?!]+(?:\s|$)\vert{}[^.?!]+$/g) || [para];
 
-                const safeTextToSpeak = para.replace(/'/g, "\\'");
-                const rawWords = para.split(/\s+/);
-                let displayHTMLWords = [];
-                let phoneticWords = [];
+                sentences.forEach((sentence) => {
+                    const trimmedSentence = sentence.trim();
+                    if(!trimmedSentence) return;
 
-                rawWords.forEach(rawWord => {
-                    const match = rawWord.match(/^([^.,?!;:()\[\]]*)([.,?!;:()\[\]]*)$/);
-                    let coreWord = match ? match[1] : rawWord;
-                    let punctuation = match ? match[2] : "";
-
-                    const cleanWord = coreWord.toLowerCase();
-                    const dictionaryEntry = spikDictionary[cleanWord];
-
-                    if (dictionaryEntry) {
-                        phoneticWords.push(dictionaryEntry.p + punctuation);
-                        let formattedWord = coreWord;
-                        if (dictionaryEntry.c === "subject") formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
-                        else if (dictionaryEntry.c === "verb") formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
-                        
-                        if (dictionaryEntry.i && dictionaryEntry.i !== "") {
-                            formattedWord = `<ruby>${formattedWord}<rt class="arti-indo">${dictionaryEntry.i}</rt></ruby>`;
-                        }
-                        displayHTMLWords.push(formattedWord + punctuation);
-                    } else {
-                        phoneticWords.push(cleanWord + punctuation);
-                        displayHTMLWords.push(rawWord);
+                    const block = document.createElement('div');
+                    // Tambahkan garis samar pembatas antar kalimat
+                    block.className = "relative group mb-6 border-b border-gray-200 dark:border-gray-700 pb-4"; 
+                    
+                    const translationMatch = trimmedSentence.match(/<Terjemahan:\s*(.*?)>/);
+                    if(translationMatch) {
+                        block.innerHTML = `<p class="reply-translation"><i class="fa-solid fa-language mr-1"></i> Orang itu bilang: "${translationMatch[1]}"</p>`;
+                        docContent.appendChild(block);
+                        return; 
                     }
-                });
 
-                const finalDisplayHTML = displayHTMLWords.join(" ");
-                const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
+                    const safeTextToSpeak = trimmedSentence.replace(/'/g, "\\'");
+                    const rawWords = trimmedSentence.split(/\s+/);
+                    let displayHTMLWords = [];
+                    let phoneticWords = [];
 
-                block.innerHTML = `
-                    <div class="pr-12">
-                        <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
-                        <div class="phonetic-input-wrapper">
-                            <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent border-b border-dashed border-gray-400 focus:outline-none focus:border-blue-500 outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
+                    rawWords.forEach(rawWord => {
+                        const match = rawWord.match(/^([^.,?!;:()\[\]]*)([.,?!;:()\[\]]*)$/);
+                        let coreWord = match ? match[1] : rawWord;
+                        let punctuation = match ? match[2] : "";
+
+                        const cleanWord = coreWord.toLowerCase();
+                        const dictionaryEntry = spikDictionary[cleanWord];
+
+                        if (dictionaryEntry) {
+                            phoneticWords.push(dictionaryEntry.p + punctuation);
+                            let formattedWord = coreWord;
+                            if (dictionaryEntry.c === "subject") formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
+                            else if (dictionaryEntry.c === "verb") formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
+                            
+                            if (dictionaryEntry.i && dictionaryEntry.i !== "") {
+                                formattedWord = `<ruby>${formattedWord}<rt class="arti-indo">${dictionaryEntry.i}</rt></ruby>`;
+                            }
+                            displayHTMLWords.push(formattedWord + punctuation);
+                        } else {
+                            phoneticWords.push(cleanWord + punctuation);
+                            displayHTMLWords.push(rawWord);
+                        }
+                    });
+
+                    const finalDisplayHTML = displayHTMLWords.join(" ");
+                    const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
+
+                    block.innerHTML = `
+                        <div class="pr-12">
+                            <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
+                            <div class="phonetic-input-wrapper">
+                                <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent focus:outline-none outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
+                            </div>
                         </div>
-                    </div>
-                    <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200 mt-2">
-                        <i class="fa-solid fa-volume-high"></i>
-                    </button>
-                `;
-                docContent.appendChild(block);
+                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-0 right-0 w-10 h-10 bg-gray-100 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 transition shadow-sm border border-gray-200 mt-2">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    `;
+                    docContent.appendChild(block);
+                });
             });
         }
 
@@ -594,7 +602,6 @@
             themeIcon.className = htmlElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
 
-        // --- PWA SERVICE WORKER ---
         let deferredPrompt;
         const installBtn = document.getElementById('install-btn');
 
