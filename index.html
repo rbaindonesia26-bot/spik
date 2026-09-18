@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spik - Travel Companion</title>
     
+    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3b82f6">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3898/3898082.png">
@@ -36,9 +37,24 @@
         .phonetic-input-wrapper { display: none; }
         .phonetic-active .phonetic-input-wrapper { display: block; }
         
-        /* Highlight khusus terjemahan jawaban lawan bicara */
         .reply-translation { color: #d97706; font-weight: bold; font-size: 0.9em; margin-top: 0.5rem; display: block;}
         .dark .reply-translation { color: #fbbf24; }
+
+        /* Efek 3D dan Gradasi Warna untuk Logo */
+        .logo-3d-wrapper {
+            filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.15)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.1));
+            display: inline-block;
+        }
+        .dark .logo-3d-wrapper {
+            filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.8)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.5));
+        }
+        .logo-gradient-text {
+            background: linear-gradient(45deg, #0ea5e9, #8b5cf6, #ec4899, #f43f5e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
 
         @media print {
             body { background-color: white !important; }
@@ -53,8 +69,13 @@
 </head>
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen flex flex-col font-sans">
 
-    <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10 flex justify-between items-center">
-        <h1 class="text-2xl font-black text-primary tracking-tighter"><i class="fa-solid fa-plane-departure mr-2"></i>SPIK <span class="text-sm font-normal text-gray-500 dark:text-gray-400">Travel</span></h1>
+    <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
+        <!-- Logo Baru 3D Gradasi -->
+        <div class="logo-3d-wrapper hover:scale-105 transition-transform duration-300 cursor-default">
+            <h1 class="text-3xl font-black tracking-tighter logo-gradient-text pb-1">
+                <i class="fa-solid fa-plane-departure mr-2"></i>SPIK <span class="text-lg font-extrabold tracking-normal opacity-90 ml-1">Travel</span>
+            </h1>
+        </div>
         
         <div class="flex items-center gap-3">
             <button id="install-btn" class="hidden bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded shadow transition font-medium flex items-center text-sm">
@@ -89,7 +110,6 @@
             <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Bicara lewat mic, atau ketik teks di sini..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
-                <!-- FITUR BARU: KAMUS DARURAT OFFLINE -->
                 <select id="travel-phrases" onchange="insertTravelPhrase()" class="bg-rose-600 text-white px-3 py-2 rounded shadow font-medium text-sm outline-none cursor-pointer">
                     <option value="">🆘 Frasa Darurat Offline</option>
                     <option value="I need help, please. (Saya butuh bantuan.)">Minta Bantuan</option>
@@ -152,9 +172,8 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-// --- KAMUS MEGA SPIK (Kosakata Inti, Past Tense, Travel & Dakwah) ---
+        // --- KAMUS MEGA SPIK (Kosakata Inti, Past Tense, Travel & Dakwah) ---
         const spikDictionary = {
-            // 1. Pronouns
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
             "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
@@ -162,8 +181,6 @@
             "me": { p: "mi", c: "", i: "saya" }, "him": { p: "him", c: "", i: "dia(L)" }, 
             "them": { p: "dem", c: "", i: "mereka" }, "my": { p: "mai", c: "", i: "milikku" }, 
             "your": { p: "yor", c: "", i: "milikmu" }, "our": { p: "aur", c: "", i: "milik kami" },
-
-            // 2. To Be & Modals
             "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
             "was": { p: "wos", c: "verb", i: "adalah(lalu)" }, "were": { p: "wer", c: "verb", i: "adalah(lalu)" },
             "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
@@ -171,8 +188,6 @@
             "can": { p: "ken", c: "verb", i: "bisa" }, "could": { p: "kud", c: "verb", i: "bisa(lalu)" },
             "will": { p: "wil", c: "verb", i: "akan" }, "would": { p: "wud", c: "verb", i: "akan" },
             "must": { p: "mast", c: "verb", i: "harus" }, "need": { p: "nid", c: "verb", i: "butuh" }, "should": { p: "syud", c: "verb", i: "seharusnya" },
-
-            // 3. 5W 1H & Conjunctions
             "what": { p: "wot", c: "", i: "apa" }, "who": { p: "hu", c: "", i: "siapa" }, 
             "where": { p: "wer", c: "", i: "dimana" }, "when": { p: "wen", c: "", i: "kapan" }, 
             "why": { p: "wai", c: "", i: "kenapa" }, "how": { p: "hau", c: "", i: "bagaimana" }, 
@@ -183,8 +198,6 @@
             "to": { p: "tu", c: "", i: "ke/untuk" }, "and": { p: "en", c: "", i: "dan" }, 
             "but": { p: "bat", c: "", i: "tetapi" }, "because": { p: "bikos", c: "", i: "karena" },
             "that": { p: "det", c: "", i: "bahwa/itu" }, "this": { p: "dis", c: "", i: "ini" },
-
-            // 4. Kata Kerja (V1 - Present)
             "go": { p: "go", c: "verb", i: "pergi" }, "want": { p: "won", c: "verb", i: "ingin" },
             "buy": { p: "bai", c: "verb", i: "beli" }, "take": { p: "teik", c: "verb", i: "mengambil" },
             "come": { p: "kam", c: "verb", i: "datang" }, "look": { p: "luk", c: "verb", i: "melihat" },
@@ -200,8 +213,6 @@
             "leave": { p: "liv", c: "verb", i: "pergi/sisa" }, "call": { p: "kol", c: "verb", i: "memanggil" },
             "preach": { p: "pric", c: "verb", i: "berdakwah" }, "pray": { p: "prei", c: "verb", i: "berdoa/shalat" },
             "speak": { p: "spik", c: "verb", i: "berbicara" }, "listen": { p: "lisen", c: "verb", i: "mendengar" },
-
-            // 5. Kata Kerja (V2 - Past Tense)
             "went": { p: "went", c: "verb", i: "pergi(lalu)" }, "wanted": { p: "wontid", c: "verb", i: "ingin(lalu)" },
             "bought": { p: "bot", c: "verb", i: "beli(lalu)" }, "took": { p: "tuk", c: "verb", i: "mengambil(lalu)" },
             "came": { p: "keim", c: "verb", i: "datang(lalu)" }, "looked": { p: "lukt", c: "verb", i: "melihat(lalu)" },
@@ -216,8 +227,6 @@
             "tried": { p: "traid", c: "verb", i: "mencoba(lalu)" }, "left": { p: "left", c: "verb", i: "pergi(lalu)" },
             "called": { p: "kold", c: "verb", i: "memanggil(lalu)" }, "preached": { p: "prict", c: "verb", i: "berdakwah(lalu)" },
             "prayed": { p: "preid", c: "verb", i: "berdoa(lalu)" }, "spoke": { p: "spouk", c: "verb", i: "berbicara(lalu)" },
-
-            // 6. Tempat, Travel, Dakwah & Spesifik PNG
             "papua": { p: "papua", c: "", i: "Papua" }, "new": { p: "nyu", c: "", i: "Baru" }, "guinea": { p: "gini", c: "", i: "Nugini" },
             "kina": { p: "kina", c: "", i: "Kina (Uang)" }, "toea": { p: "toya", c: "", i: "Sen (Koin)" },
             "money": { p: "mani", c: "", i: "uang" }, "cash": { p: "kesy", c: "", i: "tunai" },
@@ -246,13 +255,13 @@
             "mosque": { p: "mask", c: "", i: "masjid" }, "religion": { p: "rilijen", c: "", i: "agama" },
             "peace": { p: "pis", c: "", i: "kedamaian" }, "good": { p: "gud", c: "", i: "baik" }, "bad": { p: "bed", c: "", i: "buruk" }
         };
-        
+
         function insertTravelPhrase() {
             const select = document.getElementById('travel-phrases');
             if(select.value !== "") {
                 document.getElementById('inputText').value = select.value;
-                processText(true); // Langsung proses tanpa memanggil terjemahan internet
-                select.value = ""; // Reset
+                processText(true); 
+                select.value = ""; 
             }
         }
 
@@ -303,7 +312,6 @@
             }
         }
 
-        // KELOMPOK SAKLAR
         let isGrammarActive = true;
         function toggleGrammar() {
             isGrammarActive = !isGrammarActive;
@@ -365,7 +373,6 @@
             }
         }
 
-        // FITUR TERJEMAHAN DUA ARAH (Butuh Internet)
         async function translateAPI(text, sourceLang, targetLang) {
             try {
                 const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
@@ -395,7 +402,6 @@
                 const textArea = document.getElementById('inputText');
                 const loadingIndicator = document.getElementById('loading-indicator');
                 
-                // Jika sedang bicara bahasa Indonesia (ID -> EN)
                 if (currentMicMode === 'id-ID') {
                     loadingIndicator.classList.remove('hidden');
                     document.getElementById('loading-text').innerText = "Mengubah suara Indo ke tulisan Inggris...";
@@ -403,12 +409,10 @@
                     currentSpeech = translatedSpeech;
                     loadingIndicator.classList.add('hidden');
                 } 
-                // FITUR BARU TRAVEL: Jika sedang mendengar Bule bicara Inggris (EN -> ID)
                 else if (currentMicMode === 'en-US') {
                     loadingIndicator.classList.remove('hidden');
                     document.getElementById('loading-text').innerText = "Menerjemahkan ucapan Bule ke bahasa Indonesia...";
                     const artiIndo = await translateAPI(currentSpeech, 'en', 'id');
-                    // Tampilkan bahasa Inggrisnya, DITAMBAH arti bahasa Indonesianya di dalam kurung
                     if(artiIndo !== currentSpeech) {
                         currentSpeech = currentSpeech + "\n<Terjemahan: " + artiIndo + ">";
                     }
@@ -485,12 +489,11 @@
                 const block = document.createElement('div');
                 block.className = "relative group mb-6";
                 
-                // Deteksi jika baris ini adalah hasil terjemahan dari lawan bicara (ditandai dengan <Terjemahan: ... >)
                 const translationMatch = para.match(/<Terjemahan:\s*(.*?)>/);
                 if(translationMatch) {
                     block.innerHTML = `<p class="reply-translation"><i class="fa-solid fa-language mr-1"></i> Orang itu bilang: "${translationMatch[1]}"</p>`;
                     docContent.appendChild(block);
-                    return; // Lanjut ke baris berikutnya
+                    return; 
                 }
 
                 const safeTextToSpeak = para.replace(/'/g, "\\'");
@@ -558,15 +561,36 @@
             themeIcon.className = htmlElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         });
 
-        // --- PWA SERVICE WORKER (Bypass Cache Update) ---
+        // --- PWA SERVICE WORKER ---
         let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').then(reg => {
-                    reg.update(); // Selalu paksa update cache PWA setiap web dibuka
+                    reg.update(); 
                 }).catch(err => console.log('PWA Service Worker tidak terdaftar.'));
             });
         }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden');
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installBtn.classList.add('hidden');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            installBtn.classList.add('hidden');
+        });
     </script>
 </body>
 </html>
