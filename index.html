@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spik - Travel Companion</title>
     
-    <!-- PWA Meta Tags -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3b82f6">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3898/3898082.png">
@@ -40,7 +39,6 @@
         .reply-translation { color: #d97706; font-weight: bold; font-size: 0.9em; margin-top: 0.5rem; display: block;}
         .dark .reply-translation { color: #fbbf24; }
 
-        /* Efek 3D dan Gradasi Warna untuk Logo */
         .logo-3d-wrapper {
             filter: drop-shadow(2px 2px 0px rgba(0, 0, 0, 0.15)) drop-shadow(4px 4px 3px rgba(0, 0, 0, 0.1));
             display: inline-block;
@@ -70,7 +68,6 @@
 <body class="bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200 transition-colors duration-300 min-h-screen flex flex-col font-sans">
 
     <header class="bg-white dark:bg-gray-800 shadow-md p-4 sticky top-0 z-10 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
-        <!-- Logo 3D Gradasi -->
         <div class="logo-3d-wrapper hover:scale-105 transition-transform duration-300 cursor-default">
             <h1 class="text-3xl font-black tracking-tighter logo-gradient-text pb-1">
                 <i class="fa-solid fa-plane-departure mr-2"></i>SPIK <span class="text-lg font-extrabold tracking-normal opacity-90 ml-1">Travel</span>
@@ -115,6 +112,7 @@
                     <option value="I need help, please. (Saya butuh bantuan.)">Minta Bantuan</option>
                     <option value="Where is the toilet? (Dimana toilet?)">Tanya Toilet</option>
                     <option value="How much does this cost? (Berapa harganya?)">Tanya Harga</option>
+                    <option value="Please write the price here. (Tolong ketik harganya di sini.)">Minta Tulis Harga 🔢</option>
                     <option value="I do not speak English well. (Saya tidak terlalu bisa bahasa Inggris.)">Tidak Bisa Inggris</option>
                     <option value="Can you take me to the airport? (Bisa antar saya ke bandara?)">Ke Bandara</option>
                     <option value="Is there a pharmacy nearby? (Apakah ada apotek di dekat sini?)">Cari Apotek</option>
@@ -140,7 +138,6 @@
                     <i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Tampilkan
                 </button>
                 
-                <!-- TOMBOL BERSIHKAN YANG BARU -->
                 <button onclick="clearText()" class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600 transition font-medium flex items-center text-sm" title="Hapus semua teks">
                     <i class="fa-solid fa-trash-can mr-2"></i> Bersihkan
                 </button>
@@ -177,7 +174,7 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- KAMUS MEGA SPIK (Kosakata Inti, Past Tense, Travel & Dakwah) ---
+        // --- KAMUS MEGA SPIK (Kosakata Inti, Past Tense, Travel, Dakwah & ANGKA) ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
@@ -186,6 +183,7 @@
             "me": { p: "mi", c: "", i: "saya" }, "him": { p: "him", c: "", i: "dia(L)" }, 
             "them": { p: "dem", c: "", i: "mereka" }, "my": { p: "mai", c: "", i: "milikku" }, 
             "your": { p: "yor", c: "", i: "milikmu" }, "our": { p: "aur", c: "", i: "milik kami" },
+            
             "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
             "was": { p: "wos", c: "verb", i: "adalah(lalu)" }, "were": { p: "wer", c: "verb", i: "adalah(lalu)" },
             "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
@@ -193,6 +191,7 @@
             "can": { p: "ken", c: "verb", i: "bisa" }, "could": { p: "kud", c: "verb", i: "bisa(lalu)" },
             "will": { p: "wil", c: "verb", i: "akan" }, "would": { p: "wud", c: "verb", i: "akan" },
             "must": { p: "mast", c: "verb", i: "harus" }, "need": { p: "nid", c: "verb", i: "butuh" }, "should": { p: "syud", c: "verb", i: "seharusnya" },
+            
             "what": { p: "wot", c: "", i: "apa" }, "who": { p: "hu", c: "", i: "siapa" }, 
             "where": { p: "wer", c: "", i: "dimana" }, "when": { p: "wen", c: "", i: "kapan" }, 
             "why": { p: "wai", c: "", i: "kenapa" }, "how": { p: "hau", c: "", i: "bagaimana" }, 
@@ -203,6 +202,7 @@
             "to": { p: "tu", c: "", i: "ke/untuk" }, "and": { p: "en", c: "", i: "dan" }, 
             "but": { p: "bat", c: "", i: "tetapi" }, "because": { p: "bikos", c: "", i: "karena" },
             "that": { p: "det", c: "", i: "bahwa/itu" }, "this": { p: "dis", c: "", i: "ini" },
+            
             "go": { p: "go", c: "verb", i: "pergi" }, "want": { p: "won", c: "verb", i: "ingin" },
             "buy": { p: "bai", c: "verb", i: "beli" }, "take": { p: "teik", c: "verb", i: "mengambil" },
             "come": { p: "kam", c: "verb", i: "datang" }, "look": { p: "luk", c: "verb", i: "melihat" },
@@ -218,6 +218,7 @@
             "leave": { p: "liv", c: "verb", i: "pergi/sisa" }, "call": { p: "kol", c: "verb", i: "memanggil" },
             "preach": { p: "pric", c: "verb", i: "berdakwah" }, "pray": { p: "prei", c: "verb", i: "berdoa/shalat" },
             "speak": { p: "spik", c: "verb", i: "berbicara" }, "listen": { p: "lisen", c: "verb", i: "mendengar" },
+            
             "went": { p: "went", c: "verb", i: "pergi(lalu)" }, "wanted": { p: "wontid", c: "verb", i: "ingin(lalu)" },
             "bought": { p: "bot", c: "verb", i: "beli(lalu)" }, "took": { p: "tuk", c: "verb", i: "mengambil(lalu)" },
             "came": { p: "keim", c: "verb", i: "datang(lalu)" }, "looked": { p: "lukt", c: "verb", i: "melihat(lalu)" },
@@ -232,6 +233,7 @@
             "tried": { p: "traid", c: "verb", i: "mencoba(lalu)" }, "left": { p: "left", c: "verb", i: "pergi(lalu)" },
             "called": { p: "kold", c: "verb", i: "memanggil(lalu)" }, "preached": { p: "prict", c: "verb", i: "berdakwah(lalu)" },
             "prayed": { p: "preid", c: "verb", i: "berdoa(lalu)" }, "spoke": { p: "spouk", c: "verb", i: "berbicara(lalu)" },
+            
             "papua": { p: "papua", c: "", i: "Papua" }, "new": { p: "nyu", c: "", i: "Baru" }, "guinea": { p: "gini", c: "", i: "Nugini" },
             "kina": { p: "kina", c: "", i: "Kina (Uang)" }, "toea": { p: "toya", c: "", i: "Sen (Koin)" },
             "money": { p: "mani", c: "", i: "uang" }, "cash": { p: "kesy", c: "", i: "tunai" },
@@ -248,6 +250,7 @@
             "indonesian": { p: "indonisyan", c: "", i: "Indonesia" }, "hotel": { p: "hotel", c: "", i: "hotel" },
             "village": { p: "vilej", c: "", i: "desa/kampung" }, "toilet": { p: "toilit", c: "", i: "toilet" },
             "city": { p: "siti", c: "", i: "kota" }, "street": { p: "strit", c: "", i: "jalan" },
+            
             "hello": { p: "helo", c: "", i: "halo" }, "morning": { p: "morning", c: "", i: "pagi" },
             "afternoon": { p: "afternun", c: "", i: "sore" }, "night": { p: "nait", c: "", i: "malam" },
             "friend": { p: "frend", c: "", i: "teman" }, "brother": { p: "brader", c: "", i: "saudara" },
@@ -258,7 +261,24 @@
             "god": { p: "god", c: "subject", i: "Tuhan" }, "allah": { p: "allah", c: "subject", i: "Allah" },
             "islam": { p: "islam", c: "", i: "Islam" }, "muslim": { p: "muslim", c: "", i: "Muslim" },
             "mosque": { p: "mask", c: "", i: "masjid" }, "religion": { p: "rilijen", c: "", i: "agama" },
-            "peace": { p: "pis", c: "", i: "kedamaian" }, "good": { p: "gud", c: "", i: "baik" }, "bad": { p: "bed", c: "", i: "buruk" }
+            "peace": { p: "pis", c: "", i: "kedamaian" }, "good": { p: "gud", c: "", i: "baik" }, "bad": { p: "bed", c: "", i: "buruk" },
+
+            // --- TAMBAHAN ANGKA (NUMBERS) ---
+            "one": { p: "wan", c: "", i: "satu" }, "two": { p: "tu", c: "", i: "dua" }, 
+            "three": { p: "thri", c: "", i: "tiga" }, "four": { p: "for", c: "", i: "empat" }, 
+            "five": { p: "faiv", c: "", i: "lima" }, "six": { p: "siks", c: "", i: "enam" }, 
+            "seven": { p: "seven", c: "", i: "tujuh" }, "eight": { p: "eit", c: "", i: "delapan" }, 
+            "nine": { p: "nain", c: "", i: "sembilan" }, "ten": { p: "ten", c: "", i: "sepuluh" },
+            "eleven": { p: "ileven", c: "", i: "sebelas" }, "twelve": { p: "twelf", c: "", i: "dua belas" },
+            "thirteen": { p: "thertin", c: "", i: "tiga belas" }, "fourteen": { p: "fortin", c: "", i: "empat belas" },
+            "fifteen": { p: "fiftin", c: "", i: "lima belas" }, "sixteen": { p: "sikstin", c: "", i: "enam belas" },
+            "seventeen": { p: "seventin", c: "", i: "tujuh belas" }, "eighteen": { p: "eitin", c: "", i: "delapan belas" },
+            "nineteen": { p: "naintin", c: "", i: "sembilan belas" }, "twenty": { p: "twenti", c: "", i: "dua puluh" },
+            "thirty": { p: "therti", c: "", i: "tiga puluh" }, "forty": { p: "forti", c: "", i: "empat puluh" },
+            "fifty": { p: "fifti", c: "", i: "lima puluh" }, "sixty": { p: "siksti", c: "", i: "enam puluh" },
+            "seventy": { p: "seventi", c: "", i: "tujuh puluh" }, "eighty": { p: "eiti", c: "", i: "delapan puluh" },
+            "ninety": { p: "nainti", c: "", i: "sembilan puluh" }, "hundred": { p: "handred", c: "", i: "ratus" },
+            "thousand": { p: "thauzen", c: "", i: "ribu" }, "million": { p: "milyen", c: "", i: "juta" }
         };
 
         function insertTravelPhrase() {
