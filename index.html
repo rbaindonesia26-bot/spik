@@ -155,7 +155,6 @@
                     <div><strong>Petunjuk Grammar:</strong> <span class="text-blue-600 font-bold ml-1 border-b-2 border-dotted border-blue-600">Biru = Subjek</span> | <span class="text-red-600 font-bold border-b-2 border-dotted border-red-600">Merah = Kata Kerja</span></div>
                 </div>
 
-                <!-- Konten Naskah akan dimuat di sini dalam bentuk Blok Card -->
                 <div id="document-content" class="space-y-6"></div>
             </div>
         </div>
@@ -171,7 +170,7 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- KAMUS MEGA SPIK (Telah dioptimasi untuk lidah Indonesia) ---
+        // --- KAMUS MEGA SPIK ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject" }, "you": { p: "yu", c: "subject" }, "they": { p: "dei", c: "subject" }, 
             "we": { p: "wi", c: "subject" }, "he": { p: "hi", c: "subject" }, "she": { p: "syi", c: "subject" }, 
@@ -236,10 +235,7 @@
             "twenty": { p: "twen-ti", c: "" }, "thirty": { p: "ther-ti", c: "" }, "forty": { p: "for-ti", c: "" },
             "fifty": { p: "fif-ti", c: "" }, "sixty": { p: "siks-ti", c: "" }, "seventy": { p: "se-ven-ti", c: "" }, 
             "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "han-dred", c: "" },
-            "thousand": { p: "thau-zen", c: "" }, "million": { p: "mil-yen", c: "" },
-            "taqwa": { p: "tak-wa", c: "" }, "commands": { p: "ko-mands", c: "" }, "prohibitions": { p: "pro-hi-bi-syens", c: "" },
-            "steadfast": { p: "sted-fast", c: "" }, "world": { p: "werld", c: "" }, "hereafter": { p: "hir-af-ter", c: "" },
-            "happiness": { p: "he-pi-nes", c: "" }, "eternal": { p: "i-ter-nal", c: "" }, "ameen": { p: "a-min", c: "" }, "amen": { p: "a-min", c: "" }
+            "thousand": { p: "thau-zen", c: "" }, "million": { p: "mil-yen", c: "" }
         };
 
         function forceHardReset() {
@@ -379,15 +375,23 @@
             }
         }
 
+        // FITUR TERJEMAHAN DIPERBARUI: MENGGUNAKAN METODE POST (ANTI NYANGKUT)
         async function translateAPI(text, sourceLang, targetLang) {
             try {
-                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-                const response = await fetch(url);
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sourceLang}&tl=${targetLang}&dt=t`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: 'q=' + encodeURIComponent(text)
+                });
                 const data = await response.json();
                 let translatedResult = '';
                 data[0].forEach(item => { if(item[0]) translatedResult += item[0]; });
                 return translatedResult;
-            } catch (error) { return ""; }
+            } catch (error) { 
+                console.error("Terjemahan gagal:", error);
+                return text; 
+            }
         }
 
         let recognition = null;
@@ -471,7 +475,7 @@
             document.getElementById('mic-text-id').innerText = "Bicara (ID)";
         }
 
-        // --- SISTEM LAYOUT BLOK AI MODERN ---
+        // --- SISTEM LAYOUT BLOK AI MODERN (EKSPEDISI MASSAL) ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -490,95 +494,114 @@
                 if (translated) rawText = translated;
             }
 
+            // Kumpulkan semua kalimat ke dalam array
             const paragraphs = rawText.split(/\n+/).filter(p => p.trim() !== '');
+            let allSentences = [];
+            
+            paragraphs.forEach(para => {
+                const sentences = para.match(/[^.?!]+[.?!]+(?:\s|$)\vert{}[^.?!]+$/g) || [para];
+                sentences.forEach(s => {
+                    if(s.trim()) allSentences.push({ text: s.trim(), isTranslationMsg: false });
+                });
+            });
+
+            // Tandai terjemahan mic
+            allSentences.forEach(obj => {
+                const translationMatch = obj.text.match(/<Terjemahan:\s*(.*?)>/);
+                if(translationMatch) {
+                    obj.isTranslationMsg = true;
+                    obj.translationText = translationMatch[1];
+                }
+            });
+
+            // PROSES TERJEMAHAN MASSAL (1 KALI KIRIM SAJA!)
+            let translatedSentences = [];
+            if (navigator.onLine) {
+                document.getElementById('loading-text').innerText = "Menganalisis seluruh naskah ke server...";
+                const textToTranslate = allSentences.filter(s => !s.isTranslationMsg).map(s => s.text).join('\n');
+                
+                if (textToTranslate.trim() !== '') {
+                    const hasilFull = await translateAPI(textToTranslate, 'en', 'id');
+                    translatedSentences = hasilFull.split('\n');
+                }
+            }
+
+            // RENDER KE LAYAR
             let partCounter = 1;
+            let translateIndex = 0;
 
-            // Proses setiap kalimat dengan susunan 3 Blok
-            for (const para of paragraphs) {
-                const sentences = para.match(/[^.,?!;]+[.,?!;]+(?:\s|$)\vert{}[^.,?!;]+$/g) || [para];
+            for (const sentenceObj of allSentences) {
+                const block = document.createElement('div');
+                block.className = "relative group bg-white dark:bg-gray-800 rounded-xl p-5 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700 break-words mb-6"; 
+                
+                if(sentenceObj.isTranslationMsg) {
+                    block.innerHTML = `<div class="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg border-l-4 border-amber-500"><p class="text-amber-800 dark:text-amber-300 font-bold"><i class="fa-solid fa-language mr-2"></i>Orang itu bilang: "${sentenceObj.translationText}"</p></div>`;
+                    docContent.appendChild(block);
+                    continue; 
+                }
 
-                for (const sentence of sentences) {
-                    const trimmedSentence = sentence.trim();
-                    if(!trimmedSentence) continue;
+                const trimmedSentence = sentenceObj.text;
+                const safeTextToSpeak = trimmedSentence.replace(/'/g, "\\'");
+                const rawWords = trimmedSentence.split(/\s+/);
+                let displayHTMLWords = [];
+                let phoneticWords = [];
 
-                    const block = document.createElement('div');
-                    // Menggunakan gaya "Card" ala ChatGPT yang mewah
-                    block.className = "relative group bg-white dark:bg-gray-800 rounded-xl p-5 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700 break-words mb-6"; 
-                    
-                    const translationMatch = trimmedSentence.match(/<Terjemahan:\s*(.*?)>/);
-                    if(translationMatch) {
-                        block.innerHTML = `<div class="bg-amber-50 dark:bg-amber-900/30 p-4 rounded-lg border-l-4 border-amber-500"><p class="text-amber-800 dark:text-amber-300 font-bold"><i class="fa-solid fa-language mr-2"></i>Orang itu bilang: "${translationMatch[1]}"</p></div>`;
-                        docContent.appendChild(block);
-                        continue; 
-                    }
+                rawWords.forEach(rawWord => {
+                    const match = rawWord.match(/^([^.,?!;:()\[\]"']*)([.,?!;:()\[\]"']*)$/);
+                    let coreWord = match ? match[1] : rawWord;
+                    let punctuation = match ? match[2] : "";
 
-                    const safeTextToSpeak = trimmedSentence.replace(/'/g, "\\'");
-                    const rawWords = trimmedSentence.split(/\s+/);
-                    let displayHTMLWords = [];
-                    let phoneticWords = [];
+                    const cleanWord = coreWord.toLowerCase();
+                    const dictionaryEntry = spikDictionary[cleanWord];
 
-                    rawWords.forEach(rawWord => {
-                        const match = rawWord.match(/^([^.,?!;:()\[\]]*)([.,?!;:()\[\]]*)$/);
-                        let coreWord = match ? match[1] : rawWord;
-                        let punctuation = match ? match[2] : "";
-
-                        const cleanWord = coreWord.toLowerCase();
-                        const dictionaryEntry = spikDictionary[cleanWord];
-
-                        if (dictionaryEntry) {
-                            phoneticWords.push(dictionaryEntry.p + punctuation);
-                            let formattedWord = coreWord;
-                            if (dictionaryEntry.c === "subject") formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
-                            else if (dictionaryEntry.c === "verb") formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
-                            
-                            displayHTMLWords.push(formattedWord + punctuation);
-                        } else {
-                            phoneticWords.push(cleanWord + punctuation);
-                            displayHTMLWords.push(rawWord);
-                        }
-                    });
-
-                    const finalDisplayHTML = displayHTMLWords.join(" ");
-                    const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
-
-                    // Ambil arti kalimat lengkap via Internet
-                    document.getElementById('loading-text').innerText = `Menerjemahkan Bagian ${partCounter}...`;
-                    let artiKalimatLengkap = "";
-                    if(navigator.onLine) {
-                        artiKalimatLengkap = await translateAPI(trimmedSentence, 'en', 'id');
+                    if (dictionaryEntry) {
+                        phoneticWords.push(dictionaryEntry.p + punctuation);
+                        let formattedWord = coreWord;
+                        if (dictionaryEntry.c === "subject") formattedWord = `<span class="tag-subject" title="Subjek">${coreWord}</span>`;
+                        else if (dictionaryEntry.c === "verb") formattedWord = `<span class="tag-verb" title="Kata Kerja">${coreWord}</span>`;
+                        
+                        displayHTMLWords.push(formattedWord + punctuation);
                     } else {
-                        artiKalimatLengkap = "📶 Mode Darurat Offline: Arti kalimat utuh tidak tersedia tanpa sinyal.";
+                        phoneticWords.push(cleanWord + punctuation);
+                        displayHTMLWords.push(rawWord);
                     }
+                });
 
-                    // Susunan 3 Lapis (Inggris -> Cara Baca -> Arti)
-                    block.innerHTML = `
-                        <div class="pr-12 text-break-safe space-y-4">
-                            <!-- Blok Teks Inggris -->
-                            <div>
-                                <p class="text-xl sm:text-2xl font-serif text-gray-900 dark:text-gray-100 leading-relaxed">${finalDisplayHTML}</p>
-                            </div>
+                const finalDisplayHTML = displayHTMLWords.join(" ");
+                const finalPhoneticText = "/ " + phoneticWords.join(" ") + " /";
 
-                            <!-- Blok Cara Baca -->
-                            <div class="phonetic-input-wrapper bg-blue-50 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-500 mt-2">
-                                <span class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-comment-dots mr-1"></i>Cara Baca</span>
-                                <div contenteditable="true" class="phonetic-input w-full text-blue-700 dark:text-blue-300 font-mono text-base sm:text-lg bg-transparent focus:outline-none outline-none text-break-safe leading-relaxed">${finalPhoneticText}</div>
-                            </div>
-                            
-                            <!-- Blok Arti -->
-                            <div class="translate-wrapper bg-green-50 dark:bg-green-900/20 p-3 rounded border-l-4 border-green-500 mt-2">
-                                <span class="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-language mr-1"></i>Arti Kalimat</span>
-                                <p class="text-base sm:text-lg text-green-800 dark:text-green-300 leading-relaxed">${artiKalimatLengkap}</p>
-                            </div>
+                // Ambil terjemahan utuh dari array massal
+                let artiKalimatLengkap = navigator.onLine ? (translatedSentences[translateIndex] || "Terjemahan tidak tersedia.") : "📶 Mode Darurat Offline: Terjemahan utuh butuh sinyal.";
+                translateIndex++;
+
+                block.innerHTML = `
+                    <div class="pr-12 text-break-safe space-y-4">
+                        <!-- Blok Teks Inggris -->
+                        <div>
+                            <span class="text-[10px] sm:text-xs text-blue-500 font-bold mb-1 block print-hidden"><i class="fa-solid fa-list-ol mr-1"></i> Potongan ${partCounter}</span>
+                            <p class="text-xl sm:text-2xl font-serif text-gray-900 dark:text-gray-100 leading-relaxed">${finalDisplayHTML}</p>
                         </div>
 
-                        <!-- Tombol Speaker -->
-                        <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-4 right-4 w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 transition shadow-sm border border-gray-200 dark:border-gray-600">
-                            <i class="fa-solid fa-volume-high text-sm sm:text-base"></i>
-                        </button>
-                    `;
-                    docContent.appendChild(block);
-                    partCounter++;
-                }
+                        <!-- Blok Cara Baca -->
+                        <div class="phonetic-input-wrapper bg-blue-50 dark:bg-blue-900/20 p-3 rounded border-l-4 border-blue-500 mt-2">
+                            <span class="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-comment-dots mr-1"></i>Cara Baca</span>
+                            <div contenteditable="true" class="phonetic-input w-full text-blue-700 dark:text-blue-300 font-mono text-base sm:text-lg bg-transparent focus:outline-none outline-none text-break-safe leading-relaxed">${finalPhoneticText}</div>
+                        </div>
+                        
+                        <!-- Blok Arti -->
+                        <div class="translate-wrapper bg-green-50 dark:bg-green-900/20 p-3 rounded border-l-4 border-green-500 mt-2">
+                            <span class="text-xs text-green-600 dark:text-green-400 font-bold uppercase tracking-wider mb-1 block"><i class="fa-solid fa-language mr-1"></i>Arti Kalimat</span>
+                            <p class="text-base sm:text-lg text-green-800 dark:text-green-300 leading-relaxed">${artiKalimatLengkap}</p>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Speaker -->
+                    <button onclick="playAudio('${safeTextToSpeak}')" class="print-hidden absolute top-4 right-4 w-10 h-10 bg-gray-100 dark:bg-gray-700 hover:bg-primary hover:text-white rounded-full flex items-center justify-center text-gray-500 dark:text-gray-300 transition shadow-sm border border-gray-200 dark:border-gray-600">
+                        <i class="fa-solid fa-volume-high text-sm sm:text-base"></i>
+                    </button>
+                `;
+                docContent.appendChild(block);
+                partCounter++;
             }
             loadingIndicator.classList.add('hidden');
         }
