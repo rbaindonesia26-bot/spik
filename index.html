@@ -152,23 +152,100 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // Kamus Offline Cepat
+// --- KAMUS BISPIK SUPER (Kosakata Inti + Spesial Papua Nugini) ---
         const spikDictionary = {
+            // 1. Pronouns (Kata Ganti)
             "i": { p: "ai", c: "subject", i: "saya" }, "you": { p: "yu", c: "subject", i: "kamu" }, 
             "they": { p: "dei", c: "subject", i: "mereka" }, "we": { p: "wi", c: "subject", i: "kami" }, 
             "he": { p: "hi", c: "subject", i: "dia(L)" }, "she": { p: "syi", c: "subject", i: "dia(P)" }, 
             "it": { p: "it", c: "subject", i: "itu" }, "us": { p: "as", c: "subject", i: "kita" },
-            "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
-            "do": { p: "du", c: "verb", i: "melakukan" }, "have": { p: "hev", c: "verb", i: "memiliki" }, "can": { p: "ken", c: "verb", i: "bisa" },
-            "will": { p: "wil", c: "verb", i: "akan" }, "the": { p: "de", c: "", i: "" }, "a": { p: "e", c: "", i: "sebuah" },
-            "need": { p: "nid", c: "verb", i: "butuh" }, "help": { p: "help", c: "verb", i: "bantuan" },
-            "please": { p: "plis", c: "", i: "tolong" }, "where": { p: "wer", c: "", i: "dimana" },
-            "toilet": { p: "toilit", c: "", i: "toilet" }, "how": { p: "hau", c: "", i: "bagaimana/berapa" },
-            "much": { p: "mac", c: "", i: "banyak" }, "cost": { p: "kost", c: "verb", i: "harga" },
-            "airport": { p: "erport", c: "", i: "bandara" }, "food": { p: "fud", c: "", i: "makanan" },
-            "want": { p: "won", c: "verb", i: "ingin" }, "buy": { p: "bai", c: "verb", i: "beli" }
-        };
+            "me": { p: "mi", c: "", i: "saya" }, "him": { p: "him", c: "", i: "dia(L)" }, 
+            "them": { p: "dem", c: "", i: "mereka" }, "my": { p: "mai", c: "", i: "milikku" }, 
+            "your": { p: "yor", c: "", i: "milikmu" }, "our": { p: "aur", c: "", i: "milik kami" },
 
+            // 2. To Be, Modals & Auxiliaries
+            "am": { p: "em", c: "verb", i: "adalah" }, "is": { p: "is", c: "verb", i: "adalah" }, "are": { p: "ar", c: "verb", i: "adalah" },
+            "do": { p: "du", c: "verb", i: "melakukan" }, "did": { p: "did", c: "verb", i: "telah melakukan" },
+            "have": { p: "hev", c: "verb", i: "memiliki" }, "has": { p: "hes", c: "verb", i: "punya" },
+            "can": { p: "ken", c: "verb", i: "bisa" }, "will": { p: "wil", c: "verb", i: "akan" }, 
+            "must": { p: "mast", c: "verb", i: "harus" }, "need": { p: "nid", c: "verb", i: "butuh" },
+
+            // 3. Question Words (5W 1H)
+            "what": { p: "wot", c: "", i: "apa" }, "who": { p: "hu", c: "", i: "siapa" }, 
+            "where": { p: "wer", c: "", i: "dimana" }, "when": { p: "wen", c: "", i: "kapan" }, 
+            "how": { p: "hau", c: "", i: "bagaimana" }, "much": { p: "mac", c: "", i: "banyak (harga)" },
+
+            // 4. Prepositions & Conjunctions
+            "in": { p: "in", c: "", i: "di dalam" }, "on": { p: "on", c: "", i: "di atas" }, 
+            "at": { p: "et", c: "", i: "di" }, "with": { p: "wid", c: "", i: "dengan" }, 
+            "for": { p: "for", c: "", i: "untuk" }, "from": { p: "from", c: "", i: "dari" }, 
+            "to": { p: "tu", c: "", i: "ke/untuk" }, "and": { p: "en", c: "", i: "dan" }, 
+            "but": { p: "bat", c: "", i: "tetapi" }, "because": { p: "bikos", c: "", i: "karena" },
+            "that": { p: "det", c: "", i: "bahwa/itu" }, "this": { p: "dis", c: "", i: "ini" },
+
+            // 5. Common Verbs (Kata Kerja Umum)
+            "go": { p: "go", c: "verb", i: "pergi" }, "want": { p: "won", c: "verb", i: "ingin" },
+            "buy": { p: "bai", c: "verb", i: "beli" }, "take": { p: "teik", c: "verb", i: "mengambil/naik" },
+            "come": { p: "kam", c: "verb", i: "datang" }, "look": { p: "luk", c: "verb", i: "melihat/mencari" },
+            "help": { p: "help", c: "verb", i: "tolong" }, "stop": { p: "stop", c: "verb", i: "berhenti" },
+            "pay": { p: "pei", c: "verb", i: "bayar" }, "eat": { p: "it", c: "verb", i: "makan" },
+            "drink": { p: "dringk", c: "verb", i: "minum" }, "sleep": { p: "slip", c: "verb", i: "tidur" },
+
+            // --- 6. SPESIAL PAPUA NUGINI (PNG SURVIVAL KIT) ---
+            
+            // Uang & Harga
+            "kina": { p: "kina", c: "", i: "Kina (Mata uang)" }, 
+            "toea": { p: "toya", c: "", i: "Sen (Koin PNG)" },
+            "money": { p: "mani", c: "", i: "uang" }, 
+            "cash": { p: "kesy", c: "", i: "tunai" },
+            "price": { p: "prais", c: "", i: "harga" }, 
+            "cost": { p: "kost", c: "verb", i: "harganya" },
+            "expensive": { p: "ekspensiv", c: "", i: "mahal" }, 
+            "cheap": { p: "cip", c: "", i: "murah" },
+
+            // Transportasi Lokal
+            "pmv": { p: "pi-em-vi", c: "", i: "Angkot/Bus (PMV)" }, 
+            "bus": { p: "bas", c: "", i: "bus" },
+            "taxi": { p: "taksi", c: "", i: "taksi" }, 
+            "fare": { p: "fer", c: "", i: "ongkos" },
+            "airport": { p: "erport", c: "", i: "bandara" }, 
+            "flight": { p: "flait", c: "", i: "penerbangan" },
+            "boat": { p: "bout", c: "", i: "kapal" }, 
+            "dinghy": { p: "dinggi", c: "", i: "perahu motor" },
+            "ticket": { p: "tiket", c: "", i: "tiket" }, 
+            "driver": { p: "draiver", c: "", i: "supir" },
+
+            // Tempat & Lokasi
+            "port": { p: "port", c: "", i: "pelabuhan" }, 
+            "moresby": { p: "morsbi", c: "", i: "Moresby" },
+            "market": { p: "market", c: "", i: "pasar" }, 
+            "hospital": { p: "hospitel", c: "", i: "rumah sakit" },
+            "police": { p: "polis", c: "", i: "polisi" }, 
+            "embassy": { p: "embesi", c: "", i: "kedutaan" },
+            "indonesian": { p: "indonisyan", c: "", i: "Indonesia" }, 
+            "hotel": { p: "hotel", c: "", i: "hotel" },
+            "village": { p: "vilej", c: "", i: "desa/kampung" }, 
+            "toilet": { p: "toilit", c: "", i: "toilet" },
+            "city": { p: "siti", c: "", i: "kota" }, 
+            "street": { p: "strit", c: "", i: "jalan" },
+
+            // Sapaan & Keselamatan
+            "hello": { p: "helo", c: "", i: "halo" }, 
+            "morning": { p: "morning", c: "", i: "pagi" },
+            "afternoon": { p: "afternun", c: "", i: "sore" }, 
+            "night": { p: "nait", c: "", i: "malam" },
+            "friend": { p: "frend", c: "", i: "teman" }, 
+            "brother": { p: "brader", c: "", i: "saudara (akrab)" },
+            "danger": { p: "denjer", c: "", i: "bahaya" }, 
+            "safe": { p: "seif", c: "", i: "aman" },
+            "water": { p: "woter", c: "", i: "air" }, 
+            "food": { p: "fud", c: "", i: "makanan" },
+            "yes": { p: "yes", c: "", i: "ya" }, 
+            "no": { p: "no", c: "", i: "tidak" },
+            "please": { p: "plis", c: "", i: "tolong" }, 
+            "thank": { p: "thengk", c: "verb", i: "terima (kasih)" }
+        };
+        
         function insertTravelPhrase() {
             const select = document.getElementById('travel-phrases');
             if(select.value !== "") {
