@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Bicara lewat mic, atau ketik teks di sini (Gunakan titik untuk memisahkan kalimat)..."></textarea>
+            <textarea id="inputText" rows="4" class="w-full p-4 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-2 focus:ring-primary outline-none transition resize-y" placeholder="Bicara lewat mic, atau ketik teks di sini (Gunakan TITIK untuk pemisah kalimat)..."></textarea>
             
             <div class="flex flex-wrap gap-2 mt-4 items-center">
                 <select id="travel-phrases" onchange="insertTravelPhrase()" class="bg-rose-600 text-white px-3 py-2 rounded shadow font-medium text-sm outline-none cursor-pointer">
@@ -170,6 +170,14 @@
             </div>
         </div>
     </main>
+
+    <footer class="text-center p-4 text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden flex justify-center items-center gap-4">
+        <span>&copy; 2026 Spik. Travel Edition.</span>
+        <!-- TOMBOL RESET CACHE PAKSA -->
+        <button onclick="forceHardReset()" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1 rounded-full font-bold transition shadow-sm border border-red-200">
+            <i class="fa-solid fa-rotate-right mr-1"></i> Fix Tampilan Nyangkut
+        </button>
+    </footer>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
@@ -272,6 +280,20 @@
             "ninety": { p: "nainti", c: "", i: "sembilan puluh" }, "hundred": { p: "handred", c: "", i: "ratus" },
             "thousand": { p: "thauzen", c: "", i: "ribu" }, "million": { p: "milyen", c: "", i: "juta" }
         };
+
+        // --- FUNGSI RESET CACHE OTOMATIS ---
+        function forceHardReset() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) { registration.unregister(); }
+                });
+            }
+            caches.keys().then(function(names) {
+                for (let name of names) caches.delete(name);
+            });
+            alert('Sistem berhasil di-reset. Mengambil versi terbaru...');
+            window.location.href = window.location.pathname + '?v=' + new Date().getTime();
+        }
 
         function insertTravelPhrase() {
             const select = document.getElementById('travel-phrases');
@@ -489,7 +511,7 @@
             document.getElementById('mic-text-id').innerText = "Bicara Indo (ID)";
         }
 
-        // --- SISTEM PEMOTONG KALIMAT DIPERKUAT ---
+        // --- SISTEM PEMOTONG KALIMAT PERMANEN ---
         async function processText(skipTranslation = false) {
             let rawText = document.getElementById('inputText').value;
             const docContent = document.getElementById('document-content');
@@ -509,11 +531,11 @@
 
             colorLegend.classList.remove('hidden');
             
-            // Pemisahan pertama: Berdasarkan enter/baris baru
             const paragraphs = rawText.split(/\n+/).filter(p => p.trim() !== '');
+            let partCounter = 1;
 
             paragraphs.forEach((para) => {
-                // Pemisahan kedua: Berdasarkan titik, tanda seru, atau tanda tanya
+                // Memecah berdasarkan titik, tanda seru, atau tanda tanya
                 const sentences = para.match(/[^.?!]+[.?!]+(?:\s|$)\vert{}[^.?!]+$/g) || [para];
 
                 sentences.forEach((sentence) => {
@@ -564,9 +586,7 @@
 
                     block.innerHTML = `
                         <div class="pr-12">
-                            <!-- LABEL BUKTI UPDATE CACHE -->
-                            <span class="text-xs text-gray-400 font-bold mb-1 block print-hidden">Bagian:</span>
-                            
+                            <span class="text-xs text-blue-500 font-bold mb-1 block print-hidden"><i class="fa-solid fa-list-ol mr-1"></i> Bagian ${partCounter}</span>
                             <p class="text-xl mb-3 text-justify text-gray-900">${finalDisplayHTML}</p>
                             <div class="phonetic-input-wrapper">
                                 <div contenteditable="true" class="phonetic-input w-full text-blue-600 font-mono text-lg bg-transparent focus:outline-none outline-none pb-1 break-words leading-relaxed">${finalPhoneticText}</div>
@@ -577,6 +597,7 @@
                         </button>
                     `;
                     docContent.appendChild(block);
+                    partCounter++;
                 });
             });
         }
