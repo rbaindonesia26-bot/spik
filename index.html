@@ -55,7 +55,7 @@
         .exporting-pdf .text-gray-900 { color: #000 !important; }
         .exporting-pdf .translate-wrapper { background-color: #f0fdf4 !important; border-left-color: #22c55e !important; }
         .exporting-pdf .phonetic-input-wrapper { background-color: #eff6ff !important; border-left-color: #3b82f6 !important; }
-        .exporting-pdf .tok-pisin-card { background-color: #f0f9ff !important; border-color: #bae6fd !important; break-inside: avoid; }
+        .exporting-pdf .tok-pisin-card { background-color: #f0f9ff !important; border-color: #bae6fd !important; break-inside: avoid; margin-bottom: 20px !important;}
 
         @media print {
             body { background-color: white !important; }
@@ -151,6 +151,7 @@
                         <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-1"></i> <span id="phonetic-text">Bacaan (ON)</span>
                     </button>
 
+                    <!-- TOMBOL UNDUH PDF BARU -->
                     <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1 hidden sm:block"></div>
                     <button onclick="downloadPDF()" class="flex-1 sm:flex-none justify-center bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
                         <i class="fa-solid fa-file-pdf mr-1 sm:mr-2"></i> Unduh PDF
@@ -175,15 +176,15 @@
         </div>
     </main>
 
-    <!-- MODAL KAMUS TOK PISIN -->
+    <!-- MODAL KAMUS TOK PISIN TERLENGKAP -->
     <div id="phrase-modal" class="fixed inset-0 bg-black/70 z-[100] hidden flex justify-center items-center backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transform scale-95 transition-transform duration-300" id="phrase-modal-content">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transform scale-95 transition-transform duration-300" id="phrase-modal-content">
             
             <!-- Header Modal -->
             <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-4 sm:p-5 flex justify-between items-center">
                 <h2 class="text-white font-bold text-lg sm:text-xl flex items-center">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Flag_of_Papua_New_Guinea.svg/320px-Flag_of_Papua_New_Guinea.svg.png" class="w-6 h-4 mr-2 rounded-sm" alt="PNG Flag"> 
-                    Buku Saku Tok Pisin
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Flag_of_Papua_New_Guinea.svg/320px-Flag_of_Papua_New_Guinea.svg.png" class="w-6 h-4 mr-2 rounded-sm shadow-sm" alt="PNG Flag"> 
+                    Kamus Percakapan Tok Pisin
                 </h2>
                 <button onclick="closePhraseModal()" class="text-white hover:text-red-200 transition p-1 bg-white/20 rounded-full w-8 h-8 flex items-center justify-center">
                     <i class="fa-solid fa-xmark"></i>
@@ -191,7 +192,7 @@
             </div>
 
             <!-- Tab Navigasi Kategori -->
-            <div class="flex overflow-x-auto p-2 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 space-x-2" id="phrase-tabs">
+            <div class="flex overflow-x-auto p-3 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 space-x-2 scrollbar-hide" id="phrase-tabs">
                 <!-- Tabs akan di-render dari JS -->
             </div>
 
@@ -206,70 +207,66 @@
     <footer class="text-center p-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-auto font-medium print-hidden flex flex-col sm:flex-row justify-center items-center gap-3">
         <span>&copy; 2026 Spik. Travel Edition.</span>
         <button onclick="forceHardReset()" class="text-xs bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-full font-bold transition shadow-sm border border-red-200">
-            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Sistem
+            <i class="fa-solid fa-rotate-right mr-1"></i> Refresh Sistem (Anti-Nyangkut)
         </button>
     </footer>
 
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- DATABASE TOK PISIN (TERLENGKAP UNTUK TRAVEL & DAKWAH) ---
+        // --- DATABASE TOK PISIN (TERLENGKAP DENGAN JAWABAN/BALASAN) ---
         const tokPisinData = {
-            "Sapaan": [
-                { id: "Halo / Selamat Pagi", tp: "Moning", en: "Good morning" },
-                { id: "Selamat Sore", tp: "Apinun", en: "Good afternoon" },
-                { id: "Selamat Malam", tp: "Gudnait", en: "Good night" },
-                { id: "Apa kabar?", tp: "Yu orait?", en: "How are you?" },
-                { id: "Saya baik-baik saja", tp: "Mi orait tasol", en: "I am fine" },
-                { id: "Terima kasih banyak", tp: "Tenkyu tru", en: "Thank you very much" },
-                { id: "Sama-sama", tp: "I orait / Nogat samting", en: "You are welcome" },
-                { id: "Permisi / Maaf", tp: "Skius / Sori", en: "Excuse me / Sorry" },
-                { id: "Sampai jumpa nanti", tp: "Lukim yu bihain", en: "See you later" }
+            "Sapaan & Ramah Tamah": [
+                { id: "Halo / Selamat Pagi", tp: "Moning", en: "Good morning", replyId: "Selamat pagi juga", replyTp: "Moning tu", replyEn: "Good morning too" },
+                { id: "Selamat Sore", tp: "Apinun", en: "Good afternoon", replyId: "Selamat sore", replyTp: "Apinun tu", replyEn: "Good afternoon too" },
+                { id: "Apa kabar?", tp: "Yu orait?", en: "How are you?", replyId: "Saya baik-baik saja, terima kasih", replyTp: "Mi orait tasol, tenkyu", replyEn: "I am fine, thank you" },
+                { id: "Siapa nama Anda?", tp: "Wanem nem bilong yu?", en: "What is your name?", replyId: "Nama saya...", replyTp: "Nem bilong mi...", replyEn: "My name is..." },
+                { id: "Anda dari mana?", tp: "Yu kam long we?", en: "Where are you from?", replyId: "Saya dari Indonesia", replyTp: "Mi kam long Indonesia", replyEn: "I am from Indonesia" },
+                { id: "Senang bertemu denganmu", tp: "Amamas long bungim yu", en: "Nice to meet you", replyId: "Senang bertemu denganmu juga", replyTp: "Amamas long bungim yu tu", replyEn: "Nice to meet you too" },
+                { id: "Terima kasih banyak", tp: "Tenkyu tru", en: "Thank you very much", replyId: "Sama-sama / Tidak apa-apa", replyTp: "I orait / Nogat samting", replyEn: "You are welcome / No problem" },
+                { id: "Sampai jumpa lagi", tp: "Lukim yu bihain", en: "See you later", replyId: "Selamat tinggal", replyTp: "Gutbai", replyEn: "Goodbye" }
             ],
-            "Percakapan": [
-                { id: "Ya", tp: "Yes", en: "Yes" },
-                { id: "Tidak", tp: "Nogat", en: "No" },
-                { id: "Siapa nama Anda?", tp: "Wanem nem bilong yu?", en: "What is your name?" },
-                { id: "Nama saya...", tp: "Nem bilong mi...", en: "My name is..." },
-                { id: "Saya tidak mengerti", tp: "Mi no klia / Mi no save", en: "I do not understand" },
-                { id: "Tolong bicara pelan-pelan", tp: "Tok isi isi plis", en: "Please speak slowly" },
-                { id: "Apakah Anda bisa bahasa Inggris?", tp: "Yu save long Tok Inglis?", en: "Do you speak English?" },
-                { id: "Saya dari Indonesia", tp: "Mi kam long Indonesia", en: "I am from Indonesia" }
+            "Percakapan Dasar": [
+                { id: "Ya / Tidak", tp: "Yes / Nogat", en: "Yes / No" },
+                { id: "Permisi / Maaf", tp: "Skius / Sori", en: "Excuse me / Sorry", replyId: "Tidak apa-apa", replyTp: "I no gat hevi", replyEn: "No problem" },
+                { id: "Apakah Anda bisa bahasa Inggris?", tp: "Yu save long Tok Inglis?", en: "Do you speak English?", replyId: "Ya, sedikit / Tidak bisa", replyTp: "Yes, liklik tasol / Nogat, mi no save", replyEn: "Yes, a little / No, I don't know" },
+                { id: "Saya tidak mengerti", tp: "Mi no klia gut", en: "I don't understand well" },
+                { id: "Tolong bicara pelan-pelan", tp: "Tok isi isi plis", en: "Please speak slowly", replyId: "Oke, saya akan bicara pelan", replyTp: "Orait, bai mi tok isi", replyEn: "Alright, I will speak slowly" },
+                { id: "Bisa ulangi lagi?", tp: "Tokim mi gen?", en: "Can you say that again?" }
             ],
-            "Arah & Jalan": [
-                { id: "Di mana toilet?", tp: "Toilet i stap we?", en: "Where is the toilet?" },
-                { id: "Saya mau pergi ke...", tp: "Mi laik go long...", en: "I want to go to..." },
-                { id: "Tolong antar saya ke bandara", tp: "Kisim mi go long epot plis", en: "Please take me to the airport" },
-                { id: "Berhenti di sini", tp: "Stop hia", en: "Stop here" },
-                { id: "Jauh kah?", tp: "Em longwe o nogat?", en: "Is it far?" },
-                { id: "Lurus saja", tp: "Go stret", en: "Go straight" }
+            "Transportasi (PMV/Angkot)": [
+                { id: "PMV (Angkot) ini pergi ke mana?", tp: "Dispela PMV i go long we?", en: "Where does this PMV go?", replyId: "Ini pergi ke kota", replyTp: "Em i go long taun", replyEn: "It goes to the town" },
+                { id: "Bisa antar saya ke bandara?", tp: "Inap yu kisim mi go long epot?", en: "Can you take me to the airport?", replyId: "Bisa, ayo naik", replyTp: "Inap, kam insait", replyEn: "Yes, get in" },
+                { id: "Berapa ongkosnya?", tp: "Plen bilong rot em hamas?", en: "How much is the fare?", replyId: "Dua Kina", replyTp: "Tu Kina", replyEn: "Two Kina" },
+                { id: "Tolong berhenti di sini", tp: "Stop hia plis", en: "Stop here please" },
+                { id: "Apakah jaraknya jauh?", tp: "Em longwe o klostu?", en: "Is it far or near?", replyId: "Dekat saja", replyTp: "Em klostu tasol", replyEn: "It is just nearby" }
             ],
-            "Belanja": [
-                { id: "Berapa harganya?", tp: "Em hamas?", en: "How much does this cost?" },
-                { id: "Ini terlalu mahal", tp: "Em i dia tumas", en: "It is too expensive" },
-                { id: "Apakah ada air minum?", tp: "I gat wara bilong dring?", en: "Is there drinking water?" },
-                { id: "Saya mau beli makanan", tp: "Mi laik baim kaikai", en: "I want to buy food" },
-                { id: "Tolong tuliskan harganya", tp: "Raitim prais hia plis", en: "Please write the price" }
+            "Belanja & Makanan": [
+                { id: "Berapa harganya ini?", tp: "Em hamas?", en: "How much does this cost?", replyId: "Harganya lima Kina", replyTp: "Em faipela Kina", replyEn: "It is five Kina" },
+                { id: "Ini terlalu mahal", tp: "Em i dia tumas", en: "It is too expensive", replyId: "Bisa kurang sedikit", replyTp: "Inap mi daunim liklik", replyEn: "I can lower it a bit" },
+                { id: "Saya mau beli ini", tp: "Mi laik baim dispela", en: "I want to buy this" },
+                { id: "Apakah ada air minum?", tp: "I gat wara bilong dring?", en: "Is there drinking water?", replyId: "Ya, ada di sana", replyTp: "Yes, i stap long hap", replyEn: "Yes, it is over there" },
+                { id: "Makanannya sangat enak", tp: "Kaikai i swit tru", en: "The food is very delicious" }
             ],
-            "Darurat": [
+            "Dakwah & Agama": [
+                { id: "Assalamu'alaikum (Sapaan Islam)", tp: "Asalamu alaikum", en: "Peace be upon you", replyId: "Wa'alaikumsalam", replyTp: "Wa alaikum salam", replyEn: "And unto you peace" },
+                { id: "Di mana letak Masjid?", tp: "Haus lotu (Mosque) i stap we?", en: "Where is the Mosque?", replyId: "Di sebelah sana", replyTp: "Em i stap long hap", replyEn: "It is over there" },
+                { id: "Kami datang untuk bersilaturahmi", tp: "Mipela kam bilong bungim yupela", en: "We come to visit you", replyId: "Selamat datang, silakan masuk", replyTp: "Welkam tru, kam insait", replyEn: "Welcome, come inside" },
+                { id: "Hanya ada satu Tuhan, namanya Allah", tp: "Wanpela God tasol, nem bilong em Allah", en: "Only one God, His name is Allah" },
+                { id: "Mari kita shalat bersama", tp: "Yumi go beten wantaim", en: "Let us pray together" },
+                { id: "Kita semua bersaudara dalam Islam", tp: "Yumi ol brata long Islam", en: "We are brothers in Islam" },
+                { id: "Semoga Tuhan memberkati Anda", tp: "God i blesim yu", en: "May God bless you" }
+            ],
+            "Darurat & Kesehatan": [
                 { id: "Tolong saya!", tp: "Helpim mi!", en: "Help me!" },
-                { id: "Saya butuh dokter", tp: "Mi mas lukim dokta", en: "I need a doctor" },
-                { id: "Di mana rumah sakit?", tp: "Haus sik i stap we?", en: "Where is the hospital?" },
+                { id: "Saya butuh dokter", tp: "Mi mas lukim dokta", en: "I need a doctor", replyId: "Rumah sakit dekat sini", replyTp: "Haus sik i stap klostu", replyEn: "The hospital is nearby" },
                 { id: "Panggil polisi!", tp: "Singautim polis!", en: "Call the police!" },
-                { id: "Saya tersesat", tp: "Mi lusim rot", en: "I am lost" }
-            ],
-            "Dakwah": [
-                { id: "Di mana Masjid?", tp: "Haus lotu (Mosque) i stap we?", en: "Where is the Mosque?" },
-                { id: "Kami datang untuk silaturahmi", tp: "Mipela kam bilong bungim yupela", en: "We come to visit you" },
-                { id: "Allah Maha Besar", tp: "Allah em i bikpela tru", en: "Allah is the Greatest" },
-                { id: "Mari kita shalat", tp: "Yumi go beten", en: "Let us pray" },
-                { id: "Semoga Tuhan memberkati Anda", tp: "God i blesim yu", en: "May God bless you" },
-                { id: "Satu Tuhan, Allah", tp: "Wanpela God tasol, Allah", en: "Only one God, Allah" }
+                { id: "Saya tersesat", tp: "Mi lusim rot", en: "I am lost", replyId: "Anda mau pergi ke mana?", replyTp: "Yu laik go we?", replyEn: "Where do you want to go?" }
             ]
         };
 
         // --- FUNGSI MODAL TOK PISIN ---
-        let currentCategory = "Sapaan";
+        let currentCategory = "Sapaan & Ramah Tamah";
 
         function openPhraseModal() {
             const modal = document.getElementById('phrase-modal');
@@ -292,7 +289,7 @@
             Object.keys(tokPisinData).forEach(cat => {
                 const isActive = cat === currentCategory;
                 const btn = document.createElement('button');
-                btn.className = `whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition-colors ${isActive ? 'bg-blue-600 text-white shadow' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`;
+                btn.className = `whitespace-nowrap px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-colors ${isActive ? 'bg-blue-600 text-white shadow' : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'}`;
                 btn.innerText = cat;
                 btn.onclick = () => { currentCategory = cat; renderTabs(); renderPhrases(); };
                 tabsContainer.appendChild(btn);
@@ -304,35 +301,60 @@
             listContainer.innerHTML = '';
             tokPisinData[currentCategory].forEach(item => {
                 const card = document.createElement('div');
-                card.className = "bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-3 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:border-blue-300 transition-colors";
-                card.innerHTML = `
-                    <div class="flex-grow">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1">${item.id}</p>
-                        <p class="text-xl font-black text-blue-600 dark:text-blue-400 leading-tight">${item.tp}</p>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 italic mt-1 font-serif">English: ${item.en}</p>
+                card.className = "bg-white dark:bg-gray-800 p-4 sm:p-5 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 mb-4 hover:border-blue-400 transition-colors duration-200";
+                
+                let html = `
+                    <div class="flex flex-col sm:flex-row justify-between gap-4">
+                        <div class="flex-grow">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mb-1"><i class="fa-regular fa-comment-dots mr-1"></i> ${item.id}</p>
+                            <p class="text-xl sm:text-2xl font-black text-blue-600 dark:text-blue-400 leading-tight">${item.tp}</p>
+                            <p class="text-sm text-gray-600 dark:text-gray-300 italic mt-1 font-serif">English: ${item.en}</p>
+                        </div>
+                        <div class="flex items-start">
+                            <button onclick="insertTokPisin('${item.tp.replace(/'/g, "\\'")}', '${item.en.replace(/'/g, "\\'")}', '${item.id.replace(/'/g, "\\'")}')" class="w-full sm:w-auto bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center whitespace-nowrap shadow-sm border border-blue-200">
+                                <i class="fa-solid fa-share-from-square mr-2"></i> Gunakan
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="insertTokPisin('${item.tp}', '${item.en}', '${item.id}')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-bold text-sm transition flex items-center justify-center whitespace-nowrap">
-                        <i class="fa-solid fa-share-from-square mr-2"></i> Gunakan
-                    </button>
                 `;
+
+                // JIKA ADA PREDIKSI JAWABAN
+                if (item.replyTp) {
+                    html += `
+                    <div class="mt-4 bg-indigo-50 dark:bg-indigo-900/20 p-3 sm:p-4 rounded-lg border-l-4 border-indigo-400 relative">
+                        <p class="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider mb-2 flex items-center"><i class="fa-solid fa-reply mr-1"></i> Prediksi Balasan / Jawaban:</p>
+                        <div class="flex flex-col sm:flex-row justify-between gap-3 sm:items-center">
+                            <div>
+                                <p class="text-lg sm:text-xl font-bold text-indigo-800 dark:text-indigo-300">${item.replyTp}</p>
+                                <p class="text-xs sm:text-sm text-gray-600 dark:text-gray-400 italic mt-1 font-serif">Eng: ${item.replyEn} | Indo: ${item.replyId}</p>
+                            </div>
+                            <button onclick="insertTokPisin('${item.replyTp.replace(/'/g, "\\'")}', '${item.replyEn.replace(/'/g, "\\'")}', '${item.replyId.replace(/'/g, "\\'")}')" class="w-full sm:w-auto mt-2 sm:mt-0 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-3 py-1.5 rounded-md font-semibold text-xs sm:text-sm transition flex items-center justify-center whitespace-nowrap border border-indigo-200">
+                                <i class="fa-solid fa-check mr-1"></i> Pakai Jawaban
+                            </button>
+                        </div>
+                    </div>
+                    `;
+                }
+
+                card.innerHTML = html;
                 listContainer.appendChild(card);
             });
         }
 
-        // Fungsi khusus menyisipkan format Rahasia Tok Pisin ke Naskah
+        // --- SISIPKAN TOK PISIN KE NASKAH ---
         function insertTokPisin(tp, en, id) {
             const textArea = document.getElementById('inputText');
-            // Format khusus agar dibaca oleh Regex di processText
+            // Format rahasia agar dibaca jadi Kartu Biru
             const magicText = `[Tok Pisin] ${tp} / [English] ${en} <Terjemahan: ${id}>`;
             
             if (textArea.value.trim() === '') { textArea.value = magicText; }
             else { textArea.value += '\n\n' + magicText; }
             
             closePhraseModal();
-            processText(true); // Langsung proses tanpa terjemahan ulang
+            processText(true); // Proses tanpa terjemah ulang
         }
 
-        // --- KAMUS SCHWA SPIK ---
+        // --- KAMUS SCHWA SPIK (Standar Internasional) ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject" }, "you": { p: "yuu", c: "subject" }, "they": { p: "dhei", c: "subject" }, 
             "we": { p: "wii", c: "subject" }, "he": { p: "hii", c: "subject" }, "she": { p: "shii", c: "subject" }, 
@@ -375,7 +397,41 @@
             "found": { p: "fawnd", c: "verb" }, "told": { p: "told", c: "verb" }, "asked": { p: "askt", c: "verb" }, 
             "worked": { p: "wərkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
             "called": { p: "kold", c: "verb" }, "preached": { p: "priicht", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
-            "spoke": { p: "spouk", c: "verb" }
+            "spoke": { p: "spouk", c: "verb" }, 
+            "papua": { p: "pa-pua", c: "" }, "new": { p: "nyuu", c: "" }, "guinea": { p: "gi-ni", c: "" }, 
+            "kina": { p: "ki-na", c: "" }, "toea": { p: "to-ya", c: "" }, "money": { p: "mə-ni", c: "" }, 
+            "cash": { p: "kæsh", c: "" }, "price": { p: "prais", c: "" }, "cost": { p: "kost", c: "verb" }, 
+            "expensive": { p: "eks-pen-siv", c: "" }, "cheap": { p: "chiip", c: "" },
+            "pmv": { p: "pi-em-vi", c: "" }, "bus": { p: "bəs", c: "" }, "taxi": { p: "tæk-si", c: "" }, 
+            "fare": { p: "fer", c: "" }, "airport": { p: "er-port", c: "" }, "flight": { p: "flait", c: "" },
+            "boat": { p: "bout", c: "" }, "dinghy": { p: "ding-gi", c: "" }, "ticket": { p: "ti-kit", c: "" }, 
+            "driver": { p: "drai-vər", c: "" }, "port": { p: "port", c: "" }, "moresby": { p: "mors-bi", c: "" },
+            "market": { p: "mar-kit", c: "" }, "hospital": { p: "hos-pi-təl", c: "" }, "police": { p: "pə-liis", c: "" }, 
+            "embassy": { p: "em-bə-si", c: "" }, "indonesian": { p: "in-də-nii-zhən", c: "" }, "hotel": { p: "hou-tel", c: "" },
+            "village": { p: "vi-lij", c: "" }, "toilet": { p: "toi-lit", c: "" }, "city": { p: "si-ti", c: "" }, 
+            "street": { p: "striit", c: "" }, 
+            "hello": { p: "he-lou", c: "" }, "morning": { p: "mor-ning", c: "" }, "afternoon": { p: "af-tər-nuun", c: "" }, 
+            "night": { p: "nait", c: "" }, "friend": { p: "frend", c: "" }, "brother": { p: "brə-dhər", c: "" }, 
+            "danger": { p: "dein-jər", c: "" }, "safe": { p: "seif", c: "" }, "water": { p: "wo-tər", c: "" }, 
+            "food": { p: "fuud", c: "" }, "yes": { p: "yes", c: "" }, "no": { p: "nou", c: "" },
+            "please": { p: "pliiz", c: "" }, "thank": { p: "thængk", c: "verb" }, 
+            "god": { p: "god", c: "subject" }, "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, 
+            "muslim": { p: "məz-lim", c: "" }, "mosque": { p: "mosk", c: "" }, "religion": { p: "ri-li-jən", c: "" }, 
+            "peace": { p: "piis", c: "" }, "good": { p: "gud", c: "" }, "bad": { p: "bæd", c: "" }, 
+            "taqwa": { p: "taq-wa", c: "" }, "commands": { p: "kə-mandz", c: "" }, "prohibitions": { p: "pro-hi-bi-shənz", c: "" },
+            "steadfast": { p: "sted-fast", c: "" }, "world": { p: "wərld", c: "" }, "hereafter": { p: "hir-af-tər", c: "" },
+            "happiness": { p: "hæp-i-nəs", c: "" }, "eternal": { p: "i-tər-nəl", c: "" }, "ameen": { p: "a-miin", c: "" }, 
+            "amen": { p: "a-miin", c: "" },
+            "one": { p: "wən", c: "" }, "two": { p: "tuu", c: "" }, "three": { p: "thrii", c: "" }, 
+            "four": { p: "for", c: "" }, "five": { p: "faiv", c: "" }, "six": { p: "siks", c: "" }, 
+            "seven": { p: "se-vən", c: "" }, "eight": { p: "eit", c: "" }, "nine": { p: "nain", c: "" }, "ten": { p: "ten", c: "" },
+            "eleven": { p: "i-le-vən", c: "" }, "twelve": { p: "twelf", c: "" }, "thirteen": { p: "thər-tiin", c: "" }, 
+            "fourteen": { p: "for-tiin", c: "" }, "fifteen": { p: "fif-tiin", c: "" }, "sixteen": { p: "siks-tiin", c: "" },
+            "seventeen": { p: "se-vən-tiin", c: "" }, "eighteen": { p: "ei-tiin", c: "" }, "nineteen": { p: "nain-tiin", c: "" }, 
+            "twenty": { p: "twen-ti", c: "" }, "thirty": { p: "thər-ti", c: "" }, "forty": { p: "for-ti", c: "" },
+            "fifty": { p: "fif-ti", c: "" }, "sixty": { p: "siks-ti", c: "" }, "seventy": { p: "se-vən-ti", c: "" }, 
+            "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "hən-drəd", c: "" },
+            "thousand": { p: "thau-zənd", c: "" }, "million": { p: "mil-yən", c: "" }
         };
 
         // --- FUNGSI UNDUH PDF ---
@@ -408,6 +464,15 @@
             });
             alert('Sistem sedang di-reset. Mohon tunggu...');
             window.location.href = window.location.pathname + '?v=' + new Date().getTime();
+        }
+
+        function insertTravelPhrase() {
+            const select = document.getElementById('travel-phrases');
+            if(select.value !== "") {
+                document.getElementById('inputText').value = select.value;
+                processText(true); 
+                select.value = ""; 
+            }
         }
 
         function clearText() {
