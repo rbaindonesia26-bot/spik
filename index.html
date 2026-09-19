@@ -241,7 +241,7 @@
     <script>
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
 
-        // --- DATABASE TOK PISIN (TERLENGKAP DENGAN JAWABAN/BALASAN) ---
+        // --- DATABASE TOK PISIN (TERLENGKAP DENGAN JAWABAN/BALASAN) Murni dari User ---
         const tokPisinData = {
             "Sapaan & Ramah Tamah": [
                 { id: "Halo / Selamat Pagi", tp: "Moning", en: "Good morning", replyId: "Selamat pagi juga", replyTp: "Moning tu", replyEn: "Good morning too" },
@@ -292,25 +292,53 @@
             ]
         };
 
-        // --- DATABASE BARU: NASKAH DAKWAH UTUH ---
+        // --- DATABASE BARU: NASKAH DAKWAH UTUH (DENGAN 5 TEMA + DALIL) ---
         const dakwahData = [
             {
-                category: "Tema 1: Perkenalan & Persaudaraan Islam (Ukhuwah)",
+                category: "Tema 1: Persaudaraan Islam (Ukhuwah)",
                 content: [
                     { id: "Salam & Pembukaan", tp: "Asalamu alaikum. Yumi tenkyu long Allah. Em i Bikpela tru.", en: "Peace be upon you all. All praise is due to Allah. He is the Greatest." },
-                    { id: "Keesaan Allah (Tauhid)", tp: "Ol brata na susa bilong mi. Wanpela God tasol, nem bilong em Allah. Em i wokim yu na mi.", en: "My brothers and sisters. There is only one God, Allah. He created you and me." },
-                    { id: "Persaudaraan Islam", tp: "Long Islam, yumi wanpela femili. Yu kam long we, em i no samting. Yumi ol brata long bilip.", en: "In Islam, we are one family. Where you come from does not matter. We are brothers in faith." },
-                    { id: "Ajakan Mengaji", tp: "Mi kam long Indonesia bilong bungim yupela. Yumi stadi Koran na beten wantaim.", en: "I come from Indonesia to visit you. Let us study the Quran and pray together." },
-                    { id: "Penutup Doa", tp: "Allah i stiaim yumi go long stretpela rot. God i blesim yupela na femili.", en: "May Allah guide us to the right path. May God bless you and your family." }
+                    { id: "Keesaan Allah", tp: "Ol brata na susa bilong mi. Wanpela God tasol, nem bilong em Allah. Em i wokim yu na mi.", en: "My brothers and sisters. There is only one God, Allah. He created you and me." },
+                    { id: "Dalil Ukhuwah (QS. Al-Hujurat 10)", tp: "Allah i tok long Koran, ol manmeri i bilip, ol i brata na susa.", en: "Allah says in the Quran, the believers are but brothers." },
+                    { id: "Satu Keluarga", tp: "Long Islam, yumi wanpela femili. Yumi ol brata long bilip.", en: "In Islam, we are one family. We are brothers in faith." },
+                    { id: "Doa Penutup", tp: "Allah i stiaim yumi go long stretpela rot. God i blesim yupela na femili.", en: "May Allah guide us to the right path. May God bless you and your family." }
                 ]
             },
             {
                 category: "Tema 2: Mengajak Shalat (Shalat 5 Waktu)",
                 content: [
+                    { id: "Dalil Shalat (Hadits)", tp: "Profet Muhammad i tok, beten em i pos bilong lotu.", en: "Prophet Muhammad said, prayer is the pillar of religion." },
                     { id: "Panggilan Ibadah", tp: "Haus lotu i op i stap. Yumi mas go beten nau.", en: "The mosque is open. We must go to pray now." },
-                    { id: "Kewajiban Shalat", tp: "Beten faipela taim long wanpela de, em i lo bilong Allah.", en: "Praying five times a day is a command from Allah." },
-                    { id: "Membersihkan Diri (Wudhu)", tp: "Bipo long beten, yumi mas wasim han na pes bilong yumi.", en: "Before praying, we must wash our hands and face." },
-                    { id: "Ketenangan Shalat", tp: "Taim yumi beten, bel bilong yumi i stap isi.", en: "When we pray, our hearts find peace." }
+                    { id: "Kewajiban 5 Waktu", tp: "Beten faipela taim long wanpela de, em i lo bilong Allah.", en: "Praying five times a day is a command from Allah." },
+                    { id: "Wudhu (Bersuci)", tp: "Bipo long beten, yumi mas wasim han na pes bilong yumi.", en: "Before praying, we must wash our hands and face." },
+                    { id: "Ketenangan Jiwa", tp: "Taim yumi beten, bel bilong yumi i stap isi.", en: "When we pray, our hearts find peace." }
+                ]
+            },
+            {
+                category: "Tema 3: Akhlak Mulia",
+                content: [
+                    { id: "Dalil Akhlak (Hadits)", tp: "Profet Muhammad i tok, God i salim mi bilong soim gutpela pasin tru long yupela.", en: "Prophet Muhammad said, I was sent to perfect good character." },
+                    { id: "Ajaran Islam", tp: "Islam i skulim yumi long kisim gutpela pasin na gutpela bel.", en: "Islam teaches us to have good behavior and a good heart." },
+                    { id: "Menghormati Orang Tua", tp: "Yumi mas onarim papamama na helpim ol wantok.", en: "We must respect our parents and help our neighbors." },
+                    { id: "Jauhi Keburukan", tp: "Yumi no ken kros o pait. Yumi mas sori long ol arapela.", en: "We must not be angry or fight. We must be kind to others." }
+                ]
+            },
+            {
+                category: "Tema 4: Kebersihan (Penting untuk PNG)",
+                content: [
+                    { id: "Dalil Kebersihan (Hadits)", tp: "Profet i tok, klinpela pasin em i hap bilong bilip.", en: "The Prophet said, cleanliness is half of faith." },
+                    { id: "Kecintaan Allah", tp: "God i laikim ol manmeri i save wasim skin na stap klin.", en: "God loves those who are clean and pure." },
+                    { id: "Menjaga Masjid & Baju", tp: "Yumi mas lukautim bodi, klos, na haus lotu i stap klin.", en: "Let us keep our body, our clothes, and our mosque clean." },
+                    { id: "Kebersihan Jasmani", tp: "Wasim han bipo long kaikai, na wasim wara gut.", en: "Wash your hands before eating, and use clean water." }
+                ]
+            },
+            {
+                category: "Tema 5: Sabar dan Syukur",
+                content: [
+                    { id: "Ujian Hidup", tp: "Long dispela laip, yumi bungim planti hevi. Yumi mas i gat pasin bilong wet isi (sabar).", en: "In this life, we face many tests. We must be patient." },
+                    { id: "Dalil Syukur (QS. Ibrahim 7)", tp: "Allah i promis long Koran, sapos yu tok tenkyu, bai Mi givim moa blesing long yu.", en: "Allah promises in the Quran, if you are grateful, I will give you more." },
+                    { id: "Ucapkan Alhamdulillah", tp: "Oltaim yumi mas tok Alhamdulillah long olgeta samting God i givim.", en: "Always say Alhamdulillah for everything God gives us." },
+                    { id: "Janji Surga", tp: "God bai givim gutpela pe (surga) long ol manmeri i bilip na stap gut.", en: "God will give a great reward to those who believe and do good." }
                 ]
             }
         ];
@@ -368,7 +396,6 @@
                     </div>
                 `;
 
-                // JIKA ADA PREDIKSI JAWABAN
                 if (item.replyTp) {
                     html += `
                     <div class="mt-4 bg-indigo-50 dark:bg-indigo-900/20 p-3 sm:p-4 rounded-lg border-l-4 border-indigo-400 relative">
@@ -485,7 +512,7 @@
             processText(true); 
         }
 
-        // --- KAMUS SCHWA SPIK (Standar Internasional) ---
+        // --- KAMUS SCHWA SPIK (Master User + Kosakata Dakwah Baru) ---
         const spikDictionary = {
             "i": { p: "ai", c: "subject" }, "you": { p: "yuu", c: "subject" }, "they": { p: "dhei", c: "subject" }, 
             "we": { p: "wii", c: "subject" }, "he": { p: "hii", c: "subject" }, "she": { p: "shii", c: "subject" }, 
@@ -528,7 +555,29 @@
             "found": { p: "fawnd", c: "verb" }, "told": { p: "told", c: "verb" }, "asked": { p: "askt", c: "verb" }, 
             "worked": { p: "wərkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
             "called": { p: "kold", c: "verb" }, "preached": { p: "priicht", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
-            "spoke": { p: "spouk", c: "verb" }
+            "spoke": { p: "spouk", c: "verb" }, 
+            
+            // --- KOSAKATA DAKWAH BARU ---
+            "prophet": { p: "pro-fit", c: "" }, "muhammad": { p: "mu-ham-məd", c: "" }, "pillar": { p: "pi-lər", c: "" }, 
+            "religion": { p: "ri-li-jən", c: "" }, "good": { p: "gud", c: "" }, "character": { p: "kæ-rək-tər", c: "" }, 
+            "sent": { p: "sent", c: "verb" }, "perfect": { p: "pər-fikt", c: "verb" }, "cleanliness": { p: "klen-li-nəs", c: "" }, 
+            "half": { p: "haf", c: "" }, "respect": { p: "ri-spekt", c: "verb" }, "parents": { p: "pe-rənts", c: "" }, 
+            "neighbors": { p: "nei-bərz", c: "" }, "tests": { p: "tests", c: "" }, "patient": { p: "pei-shənt", c: "" }, 
+            "promises": { p: "pro-mi-siz", c: "verb" }, "grateful": { p: "greit-ful", c: "" }, "more": { p: "mor", c: "" }, 
+            "always": { p: "ol-weiz", c: "" }, "everything": { p: "ev-ri-thing", c: "" }, "gives": { p: "givz", c: "verb" }, 
+            "behavior": { p: "bi-hei-vyər", c: "" }, "heart": { p: "hart", c: "" }, "body": { p: "bo-di", c: "" }, 
+            "clothes": { p: "klowdhz", c: "" }, "keep": { p: "kiip", c: "verb" }, "pure": { p: "pyur", c: "" }, 
+            "loves": { p: "ləvz", c: "verb" }, "those": { p: "dhouz", c: "" }, "god": { p: "god", c: "subject" }, 
+            "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, "muslim": { p: "məz-lim", c: "" }, 
+            "mosque": { p: "mosk", c: "" }, "peace": { p: "piis", c: "" }, "upon": { p: "ə-pon", c: "" }, 
+            "praise": { p: "preiz", c: "" }, "due": { p: "duu", c: "" }, "greatest": { p: "grei-tist", c: "" }, 
+            "brothers": { p: "brə-dhərz", c: "" }, "sisters": { p: "sis-tərz", c: "" }, "only": { p: "oun-li", c: "" }, 
+            "created": { p: "kri-ei-tid", c: "verb" }, "family": { p: "fæ-mə-li", c: "" }, "matter": { p: "mæ-tər", c: "" }, 
+            "faith": { p: "feith", c: "" }, "visit": { p: "vi-zit", c: "verb" }, "study": { p: "stə-di", c: "verb" }, 
+            "quran": { p: "ku-ran", c: "" }, "together": { p: "tə-ge-dhər", c: "" }, "may": { p: "mei", c: "verb" }, 
+            "guide": { p: "gaid", c: "verb" }, "right": { p: "rait", c: "" }, "path": { p: "path", c: "" }, 
+            "bless": { p: "bles", c: "verb" }, "believers": { p: "bi-li-vərz", c: "" }, "says": { p: "sez", c: "verb" },
+            "reward": { p: "ri-word", c: "" }, "great": { p: "greit", c: "" }, "believe": { p: "bi-liiv", c: "verb" }
         };
 
         // --- FUNGSI UNDUH PDF ---
@@ -804,6 +853,7 @@
                 let partCounter = 1;
 
                 for (const para of paragraphs) {
+                    // PERBAIKAN TYPO: Mengganti \vert{} dengan |
                     const sentences = para.match(/[^.?!;]+[.?!;]+(?:\s|$)\vert{}[^.?!;]+$/g) || [para];
 
                     for (const sentence of sentences) {
