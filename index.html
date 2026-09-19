@@ -56,6 +56,9 @@
         .exporting-pdf .translate-wrapper { background-color: #f0fdf4 !important; border-left-color: #22c55e !important; }
         .exporting-pdf .phonetic-input-wrapper { background-color: #eff6ff !important; border-left-color: #3b82f6 !important; }
         .exporting-pdf .tok-pisin-card { background-color: #f0f9ff !important; border-color: #bae6fd !important; break-inside: avoid; margin-bottom: 20px !important;}
+        
+        /* CSS BARU UNTUK KARTU DAKWAH SAAT CETAK */
+        .exporting-pdf .dakwah-card { background-color: #ecfdf5 !important; border-color: #a7f3d0 !important; break-inside: avoid; margin-bottom: 20px !important;}
 
         @media print {
             body { background-color: white !important; }
@@ -115,6 +118,11 @@
                     <i class="fa-solid fa-book-atlas mr-2"></i> Kamus Tok Pisin (PNG)
                 </button>
 
+                <!-- TOMBOL BARU: NASKAH DAKWAH -->
+                <button onclick="openSermonModal()" class="w-full sm:w-auto justify-center bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-4 py-2 rounded shadow-md transition font-bold flex items-center text-xs sm:text-sm hover:scale-105 duration-200 transform">
+                    <i class="fa-solid fa-mosque mr-2"></i> Naskah Dakwah
+                </button>
+
                 <div class="w-full h-px bg-gray-200 dark:bg-gray-700 my-1 sm:hidden"></div>
 
                 <button id="btn-mic-en" onclick="toggleListening('en-US')" class="flex-1 sm:flex-none justify-center bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
@@ -151,7 +159,7 @@
                         <i id="phonetic-icon" class="fa-solid fa-comment-dots mr-1"></i> <span id="phonetic-text">Bacaan (ON)</span>
                     </button>
 
-                    <!-- TOMBOL UNDUH PDF BARU -->
+                    <!-- TOMBOL UNDUH PDF -->
                     <div class="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1 hidden sm:block"></div>
                     <button onclick="downloadPDF()" class="flex-1 sm:flex-none justify-center bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded shadow transition font-medium flex items-center text-xs sm:text-sm">
                         <i class="fa-solid fa-file-pdf mr-1 sm:mr-2"></i> Unduh PDF
@@ -201,6 +209,25 @@
                 <!-- Kartu kosakata akan di-render dari JS -->
             </div>
 
+        </div>
+    </div>
+
+    <!-- MODAL BARU: NASKAH DAKWAH / CERAMAH -->
+    <div id="sermon-modal" class="fixed inset-0 bg-black/70 z-[100] hidden flex justify-center items-center backdrop-blur-sm p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-gray-900 w-full max-w-3xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transform scale-95 transition-transform duration-300" id="sermon-modal-content">
+            
+            <div class="bg-gradient-to-r from-emerald-600 to-teal-700 p-4 sm:p-5 flex justify-between items-center">
+                <h2 class="text-white font-bold text-lg sm:text-xl flex items-center">
+                    <i class="fa-solid fa-mosque mr-2"></i> Pustaka Naskah Dakwah PNG
+                </h2>
+                <button onclick="closeSermonModal()" class="text-white hover:text-red-200 transition p-1 bg-white/20 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="overflow-y-auto p-4 sm:p-6 bg-gray-100 dark:bg-gray-900 flex-grow" id="sermon-list">
+                <!-- Kartu Naskah Dakwah akan dirender di sini -->
+            </div>
         </div>
     </div>
 
@@ -264,6 +291,29 @@
                 { id: "Saya tersesat", tp: "Mi lusim rot", en: "I am lost", replyId: "Anda mau pergi ke mana?", replyTp: "Yu laik go we?", replyEn: "Where do you want to go?" }
             ]
         };
+
+        // --- DATABASE BARU: NASKAH DAKWAH UTUH ---
+        const dakwahData = [
+            {
+                category: "Tema 1: Perkenalan & Persaudaraan Islam (Ukhuwah)",
+                content: [
+                    { id: "Salam & Pembukaan", tp: "Asalamu alaikum. Yumi tenkyu long Allah. Em i Bikpela tru.", en: "Peace be upon you all. All praise is due to Allah. He is the Greatest." },
+                    { id: "Keesaan Allah (Tauhid)", tp: "Ol brata na susa bilong mi. Wanpela God tasol, nem bilong em Allah. Em i wokim yu na mi.", en: "My brothers and sisters. There is only one God, Allah. He created you and me." },
+                    { id: "Persaudaraan Islam", tp: "Long Islam, yumi wanpela femili. Yu kam long we, em i no samting. Yumi ol brata long bilip.", en: "In Islam, we are one family. Where you come from does not matter. We are brothers in faith." },
+                    { id: "Ajakan Mengaji", tp: "Mi kam long Indonesia bilong bungim yupela. Yumi stadi Koran na beten wantaim.", en: "I come from Indonesia to visit you. Let us study the Quran and pray together." },
+                    { id: "Penutup Doa", tp: "Allah i stiaim yumi go long stretpela rot. God i blesim yupela na femili.", en: "May Allah guide us to the right path. May God bless you and your family." }
+                ]
+            },
+            {
+                category: "Tema 2: Mengajak Shalat (Shalat 5 Waktu)",
+                content: [
+                    { id: "Panggilan Ibadah", tp: "Haus lotu i op i stap. Yumi mas go beten nau.", en: "The mosque is open. We must go to pray now." },
+                    { id: "Kewajiban Shalat", tp: "Beten faipela taim long wanpela de, em i lo bilong Allah.", en: "Praying five times a day is a command from Allah." },
+                    { id: "Membersihkan Diri (Wudhu)", tp: "Bipo long beten, yumi mas wasim han na pes bilong yumi.", en: "Before praying, we must wash our hands and face." },
+                    { id: "Ketenangan Shalat", tp: "Taim yumi beten, bel bilong yumi i stap isi.", en: "When we pray, our hearts find peace." }
+                ]
+            }
+        ];
 
         // --- FUNGSI MODAL TOK PISIN ---
         let currentCategory = "Sapaan & Ramah Tamah";
@@ -344,14 +394,95 @@
         // --- SISIPKAN TOK PISIN KE NASKAH ---
         function insertTokPisin(tp, en, id) {
             const textArea = document.getElementById('inputText');
-            // Format rahasia agar dibaca jadi Kartu Biru
             const magicText = `[Tok Pisin] ${tp} / [English] ${en} <Terjemahan: ${id}>`;
             
             if (textArea.value.trim() === '') { textArea.value = magicText; }
             else { textArea.value += '\n\n' + magicText; }
             
             closePhraseModal();
-            processText(true); // Proses tanpa terjemah ulang
+            processText(true); 
+        }
+
+        // --- FUNGSI MODAL NASKAH DAKWAH ---
+        function openSermonModal() {
+            const modal = document.getElementById('sermon-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('sermon-modal-content').classList.remove('scale-95'); }, 10);
+            renderSermons();
+        }
+
+        function closeSermonModal() {
+            const modal = document.getElementById('sermon-modal');
+            modal.classList.add('opacity-0');
+            document.getElementById('sermon-modal-content').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function renderSermons() {
+            const listContainer = document.getElementById('sermon-list');
+            listContainer.innerHTML = '';
+            
+            dakwahData.forEach((tema, index) => {
+                const section = document.createElement('div');
+                section.className = "mb-6";
+                
+                let html = `
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-emerald-700 dark:text-emerald-400 font-black text-lg border-b-2 border-emerald-500 pb-1 inline-block"><i class="fa-solid fa-quote-left mr-2"></i> ${tema.category}</h3>
+                        <button onclick="injectFullSermon(${index})" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow-sm">
+                            <i class="fa-solid fa-download mr-1"></i> Pakai Semua
+                        </button>
+                    </div>
+                    <div class="space-y-3">
+                `;
+
+                tema.content.forEach(item => {
+                    html += `
+                        <div class="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+                            <div class="flex-grow">
+                                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wider mb-1">${item.id}</p>
+                                <p class="text-lg font-bold text-gray-900 dark:text-gray-100">${item.en}</p>
+                                <p class="text-sm text-emerald-600 dark:text-emerald-400 italic mt-1"><i class="fa-solid fa-language text-xs mr-1"></i> Tok Pisin: ${item.tp}</p>
+                            </div>
+                            <button onclick="insertSermonLine('${item.tp.replace(/'/g, "\\'")}', '${item.en.replace(/'/g, "\\'")}', '${item.id.replace(/'/g, "\\'")}')" class="bg-gray-100 hover:bg-emerald-100 text-gray-700 hover:text-emerald-700 px-3 py-2 rounded-lg font-bold text-xs transition border border-gray-300 whitespace-nowrap">
+                                <i class="fa-solid fa-plus mr-1"></i> Sisipkan
+                            </button>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                listContainer.appendChild(section);
+            });
+        }
+
+        // --- FUNGSI INJEKSI NASKAH DAKWAH ---
+        function insertSermonLine(tp, en, id) {
+            const textArea = document.getElementById('inputText');
+            // Menyisipkan Teks Inggris untuk dibaca Schwa, ditambah Kartu Dakwah (Hijau)
+            const magicText = `${en}\n[Dakwah] ${tp} / [English] ${en} <Terjemahan: ${id}>`;
+            
+            if (textArea.value.trim() === '') { textArea.value = magicText; }
+            else { textArea.value += '\n\n' + magicText; }
+            
+            closeSermonModal();
+        }
+
+        function injectFullSermon(temaIndex) {
+            const textArea = document.getElementById('inputText');
+            const tema = dakwahData[temaIndex];
+            
+            let fullText = "";
+            tema.content.forEach(item => {
+                fullText += `${item.en}\n[Dakwah] ${item.tp} / [English] ${item.en} <Terjemahan: ${item.id}>\n\n`;
+            });
+
+            if (textArea.value.trim() === '') { textArea.value = fullText.trim(); }
+            else { textArea.value += '\n\n' + fullText.trim(); }
+            
+            closeSermonModal();
+            processText(true); 
         }
 
         // --- KAMUS SCHWA SPIK (Standar Internasional) ---
@@ -397,41 +528,7 @@
             "found": { p: "fawnd", c: "verb" }, "told": { p: "told", c: "verb" }, "asked": { p: "askt", c: "verb" }, 
             "worked": { p: "wərkt", c: "verb" }, "tried": { p: "traid", c: "verb" }, "left": { p: "left", c: "verb" },
             "called": { p: "kold", c: "verb" }, "preached": { p: "priicht", c: "verb" }, "prayed": { p: "preid", c: "verb" }, 
-            "spoke": { p: "spouk", c: "verb" }, 
-            "papua": { p: "pa-pua", c: "" }, "new": { p: "nyuu", c: "" }, "guinea": { p: "gi-ni", c: "" }, 
-            "kina": { p: "ki-na", c: "" }, "toea": { p: "to-ya", c: "" }, "money": { p: "mə-ni", c: "" }, 
-            "cash": { p: "kæsh", c: "" }, "price": { p: "prais", c: "" }, "cost": { p: "kost", c: "verb" }, 
-            "expensive": { p: "eks-pen-siv", c: "" }, "cheap": { p: "chiip", c: "" },
-            "pmv": { p: "pi-em-vi", c: "" }, "bus": { p: "bəs", c: "" }, "taxi": { p: "tæk-si", c: "" }, 
-            "fare": { p: "fer", c: "" }, "airport": { p: "er-port", c: "" }, "flight": { p: "flait", c: "" },
-            "boat": { p: "bout", c: "" }, "dinghy": { p: "ding-gi", c: "" }, "ticket": { p: "ti-kit", c: "" }, 
-            "driver": { p: "drai-vər", c: "" }, "port": { p: "port", c: "" }, "moresby": { p: "mors-bi", c: "" },
-            "market": { p: "mar-kit", c: "" }, "hospital": { p: "hos-pi-təl", c: "" }, "police": { p: "pə-liis", c: "" }, 
-            "embassy": { p: "em-bə-si", c: "" }, "indonesian": { p: "in-də-nii-zhən", c: "" }, "hotel": { p: "hou-tel", c: "" },
-            "village": { p: "vi-lij", c: "" }, "toilet": { p: "toi-lit", c: "" }, "city": { p: "si-ti", c: "" }, 
-            "street": { p: "striit", c: "" }, 
-            "hello": { p: "he-lou", c: "" }, "morning": { p: "mor-ning", c: "" }, "afternoon": { p: "af-tər-nuun", c: "" }, 
-            "night": { p: "nait", c: "" }, "friend": { p: "frend", c: "" }, "brother": { p: "brə-dhər", c: "" }, 
-            "danger": { p: "dein-jər", c: "" }, "safe": { p: "seif", c: "" }, "water": { p: "wo-tər", c: "" }, 
-            "food": { p: "fuud", c: "" }, "yes": { p: "yes", c: "" }, "no": { p: "nou", c: "" },
-            "please": { p: "pliiz", c: "" }, "thank": { p: "thængk", c: "verb" }, 
-            "god": { p: "god", c: "subject" }, "allah": { p: "al-lah", c: "subject" }, "islam": { p: "is-lam", c: "" }, 
-            "muslim": { p: "məz-lim", c: "" }, "mosque": { p: "mosk", c: "" }, "religion": { p: "ri-li-jən", c: "" }, 
-            "peace": { p: "piis", c: "" }, "good": { p: "gud", c: "" }, "bad": { p: "bæd", c: "" }, 
-            "taqwa": { p: "taq-wa", c: "" }, "commands": { p: "kə-mandz", c: "" }, "prohibitions": { p: "pro-hi-bi-shənz", c: "" },
-            "steadfast": { p: "sted-fast", c: "" }, "world": { p: "wərld", c: "" }, "hereafter": { p: "hir-af-tər", c: "" },
-            "happiness": { p: "hæp-i-nəs", c: "" }, "eternal": { p: "i-tər-nəl", c: "" }, "ameen": { p: "a-miin", c: "" }, 
-            "amen": { p: "a-miin", c: "" },
-            "one": { p: "wən", c: "" }, "two": { p: "tuu", c: "" }, "three": { p: "thrii", c: "" }, 
-            "four": { p: "for", c: "" }, "five": { p: "faiv", c: "" }, "six": { p: "siks", c: "" }, 
-            "seven": { p: "se-vən", c: "" }, "eight": { p: "eit", c: "" }, "nine": { p: "nain", c: "" }, "ten": { p: "ten", c: "" },
-            "eleven": { p: "i-le-vən", c: "" }, "twelve": { p: "twelf", c: "" }, "thirteen": { p: "thər-tiin", c: "" }, 
-            "fourteen": { p: "for-tiin", c: "" }, "fifteen": { p: "fif-tiin", c: "" }, "sixteen": { p: "siks-tiin", c: "" },
-            "seventeen": { p: "se-vən-tiin", c: "" }, "eighteen": { p: "ei-tiin", c: "" }, "nineteen": { p: "nain-tiin", c: "" }, 
-            "twenty": { p: "twen-ti", c: "" }, "thirty": { p: "thər-ti", c: "" }, "forty": { p: "for-ti", c: "" },
-            "fifty": { p: "fif-ti", c: "" }, "sixty": { p: "siks-ti", c: "" }, "seventy": { p: "se-vən-ti", c: "" }, 
-            "eighty": { p: "ei-ti", c: "" }, "ninety": { p: "nain-ti", c: "" }, "hundred": { p: "hən-drəd", c: "" },
-            "thousand": { p: "thau-zənd", c: "" }, "million": { p: "mil-yən", c: "" }
+            "spoke": { p: "spouk", c: "verb" }
         };
 
         // --- FUNGSI UNDUH PDF ---
@@ -716,7 +813,7 @@
                         const block = document.createElement('div');
                         block.className = "relative group bg-white dark:bg-gray-800 rounded-xl p-5 sm:p-6 shadow-sm border border-gray-200 dark:border-gray-700 break-words mb-6"; 
                         
-                        // DETEKSI KARTU KHUSUS TOK PISIN
+                        // DETEKSI KARTU KHUSUS TOK PISIN (BIRU)
                         const tpMatch = trimmedSentence.match(/\[Tok Pisin\](.*?)\[English\](.*?)<Terjemahan:\s*(.*?)>/i);
                         if(tpMatch) {
                             const tpText = tpMatch[1].replace('/', '').trim();
@@ -730,6 +827,25 @@
                                     <p class="text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mt-3 mb-1">${idText}</p>
                                     <p class="text-2xl sm:text-3xl font-black text-blue-700 dark:text-blue-400 leading-tight">${tpText}</p>
                                     <p class="text-sm sm:text-base text-gray-600 dark:text-gray-300 italic mt-2 font-serif border-t border-blue-200 dark:border-blue-700/50 pt-2">English: ${enText}</p>
+                                </div>
+                            `;
+                            docContent.appendChild(block);
+                            continue; 
+                        }
+
+                        // DETEKSI KARTU NASKAH DAKWAH (HIJAU ZAMRUD)
+                        const dakwahMatch = trimmedSentence.match(/\[Dakwah\](.*?)\[English\](.*?)<Terjemahan:\s*(.*?)>/i);
+                        if(dakwahMatch) {
+                            const tpText = dakwahMatch[1].replace('/', '').trim();
+                            const enText = dakwahMatch[2].trim();
+                            const idText = dakwahMatch[3].trim();
+                            
+                            block.className = "dakwah-card relative group bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 rounded-xl p-5 sm:p-6 shadow-sm border border-emerald-200 dark:border-emerald-800 break-words mb-6";
+                            block.innerHTML = `
+                                <div class="pr-12">
+                                    <span class="bg-emerald-600 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded uppercase tracking-wider print-hidden"><i class="fa-solid fa-volume-high mr-1"></i> Sampaikan di Mimbar</span>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400 font-bold uppercase tracking-wider mt-3 mb-1">${idText}</p>
+                                    <p class="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-400 leading-tight">${tpText}</p>
                                 </div>
                             `;
                             docContent.appendChild(block);
